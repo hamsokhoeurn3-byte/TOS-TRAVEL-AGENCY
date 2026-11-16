@@ -24,12 +24,18 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-8">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="inline-flex rounded-xl bg-white p-2 shadow-md">
+            <div className="inline-flex items-center gap-3">
               <img
                 src="/TOS_Travel_Agency_Logo.png?v=3"
                 alt="TOS Travel Agency"
-                className="h-16 w-auto object-contain"
+                className="aspect-square h-14 w-14 rounded-full object-contain mix-blend-multiply"
               />
+              <span className="flex flex-col items-start font-display leading-tight text-white">
+                <span className="text-sm font-bold tracking-wide sm:text-base">TOS</span>
+                <span className="text-[10px] font-semibold tracking-[0.12em] sm:text-xs">
+                  TRAVEL AGENCY
+                </span>
+              </span>
             </div>
             <p className="mt-5 flex items-start gap-2 text-sm leading-relaxed text-brand-200">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold-400" />

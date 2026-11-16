@@ -93,7 +93,7 @@ export default function Header() {
             <img
               src="/TOS_Travel_Agency_Logo.png?v=3"
               alt="TOS Travel Agency"
-              className="aspect-square h-14 w-14 shrink-0 object-contain mix-blend-multiply"
+              className="aspect-square h-14 w-14 shrink-0 rounded-full object-contain mix-blend-multiply"
             />
             <span
               className={`flex flex-col items-start font-display leading-tight ${
