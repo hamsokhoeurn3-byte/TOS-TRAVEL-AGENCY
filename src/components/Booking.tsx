@@ -1,0 +1,163 @@
+import { BedDouble, Car, Check, Landmark, Star, type LucideIcon } from 'lucide-react';
+import type { Hotel, Tour } from '@/lib/supabase';
+import { Reveal } from './Reveal';
+import AccommodationForm from './booking/AccommodationForm';
+import TourForm from './booking/TourForm';
+import TransportForm from './booking/TransportForm';
+import ServiceForm from './booking/ServiceForm';
+
+export type BookingCategory = 'accommodation' | 'tours' | 'transportation' | 'other';
+
+type Category = {
+  key: BookingCategory;
+  title: string;
+  subtitle: string;
+  image: string;
+  icon: LucideIcon;
+  panelTitle: string;
+  panelText: string;
+};
+
+const categories: Category[] = [
+  {
+    key: 'accommodation',
+    title: 'Accommodation',
+    subtitle: 'Find your stay',
+    image: 'https://images.pexels.com/photos/14547139/pexels-photo-14547139.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+    icon: BedDouble,
+    panelTitle: 'Book Your Stay With Us',
+    panelText:
+      "Skip the third-party sites. Tell us where you'd like to stay and we arrange the room and your airport pickup in one go.",
+  },
+  {
+    key: 'tours',
+    title: 'Tours',
+    subtitle: 'Explore destinations',
+    image: 'https://images.pexels.com/photos/15890577/pexels-photo-15890577.jpeg?auto=compress&cs=tinysrgb&w=900',
+    icon: Landmark,
+    panelTitle: 'Book Your Holiday',
+    panelText:
+      'Reserve your seat in under a minute. We confirm every booking within a few hours, and no payment is needed today.',
+  },
+  {
+    key: 'transportation',
+    title: 'Transportation',
+    subtitle: 'Arrange your transfer',
+    image: 'https://images.pexels.com/photos/39075475/pexels-photo-39075475.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+    icon: Car,
+    panelTitle: 'Book Your Transfer',
+    panelText:
+      'Reliable private airport pickups and city-to-city transfers across Cambodia, confirmed within a few hours.',
+  },
+  {
+    key: 'other',
+    title: 'Other Services',
+    subtitle: 'Explore more services',
+    image: 'https://images.pexels.com/photos/18152639/pexels-photo-18152639.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+    icon: Star,
+    panelTitle: 'Book Special Experiences',
+    panelText:
+      'Customize your Cambodia trip with hot air balloon rides and other special experiences. No payment is needed today.',
+  },
+];
+
+type Props = {
+  tours: Tour[];
+  hotels: Hotel[];
+  category: BookingCategory;
+  onCategoryChange: (category: BookingCategory) => void;
+  selectedTour: Tour | null;
+  onChangeTour: (slug: string) => void;
+  selectedHotel: Hotel | null;
+  onChangeHotel: (hotel: Hotel | null) => void;
+};
+
+export default function Booking({
+  tours,
+  hotels,
+  category,
+  onCategoryChange,
+  selectedTour,
+  onChangeTour,
+  selectedHotel,
+  onChangeHotel,
+}: Props) {
+  const active = categories.find((c) => c.key === category) ?? categories[0];
+
+  return (
+    <section id="booking" className="bg-clay-50 py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-8">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold-600">Booking</p>
+          <h2 className="mt-3 font-display text-3xl font-bold text-brand-950 sm:text-4xl">Book Now</h2>
+          <p className="mt-4 leading-relaxed text-clay-600">
+            Choose a service and start planning your trip in Cambodia.
+          </p>
+        </Reveal>
+
+        <div role="tablist" className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {categories.map((c) => {
+            const isActive = c.key === category;
+            const Icon = c.icon;
+            return (
+              <button
+                key={c.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => onCategoryChange(c.key)}
+                className={`group relative overflow-hidden rounded-2xl border-2 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+                  isActive ? 'border-gold-500 shadow-lg' : 'border-clay-100'
+                }`}
+              >
+                <div className="relative h-24 overflow-hidden sm:h-32">
+                  <img
+                    src={c.image}
+                    alt=""
+                    className={`h-full w-full object-cover transition-all duration-500 ${
+                      isActive ? 'scale-100' : 'grayscale group-hover:grayscale-0'
+                    }`}
+                  />
+                  {isActive && (
+                    <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-gold-500 text-brand-950 shadow-md">
+                      <Check className="h-4 w-4" />
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 p-4">
+                  <Icon className="h-5 w-5 shrink-0 text-brand-700" />
+                  <span>
+                    <span className="block text-sm font-bold text-brand-900">{c.title}</span>
+                    <span className="block text-xs text-clay-500">{c.subtitle}</span>
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 overflow-hidden rounded-3xl bg-white shadow-xl lg:grid lg:grid-cols-5">
+          <div className="relative h-56 overflow-hidden lg:col-span-2 lg:h-auto">
+            <img src={active.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/40 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-8 lg:p-10">
+              <h3 className="font-display text-2xl font-bold text-white">{active.panelTitle}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/85">{active.panelText}</p>
+            </div>
+          </div>
+
+          <div className="p-8 sm:p-10 lg:col-span-3">
+            {category === 'accommodation' && (
+              <AccommodationForm hotels={hotels} selectedHotel={selectedHotel} onChangeHotel={onChangeHotel} />
+            )}
+            {category === 'tours' && (
+              <TourForm tours={tours} selectedTour={selectedTour} onChangeTour={onChangeTour} />
+            )}
+            {category === 'transportation' && <TransportForm />}
+            {category === 'other' && <ServiceForm />}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
