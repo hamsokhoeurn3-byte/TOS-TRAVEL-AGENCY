@@ -1,58 +1,389 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TOS Travel Agency
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A full-stack travel agency web application built with **React, TypeScript, Vite, Laravel, PHP, and MySQL**.
 
-## About Laravel
+This repository contains both the frontend and backend in one project.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1. Project Structure
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```text
+TOS-TRAVEL-AGENCY/
+│
+├── backend/                 # Laravel backend (REST API)
+│   ├── app/
+│   ├── database/
+│   ├── routes/
+│   ├── public/
+│   ├── .env.example
+│   └── artisan
+│
+├── src/                     # React frontend
+│   ├── components/
+│   ├── lib/
+│   └── ...
+│
+├── public/                  # Frontend public assets
+├── package.json
+├── index.html
+└── README.md
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## 2. Technologies
 
-## Contributing
+### Frontend
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Backend
+- Laravel 13
+- PHP 8.3+
+- REST API
 
-## Code of Conduct
+### Databases
+- MySQL — Laravel application data
+- Supabase — AI Trip Planner data (still used by the current project)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 3. Requirements
 
-## Security Vulnerabilities
+Install the following software before starting:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| Software | Recommended version |
+|---|---|
+| PHP | 8.3 or newer |
+| Composer | Latest |
+| Node.js | 20 or newer |
+| npm | Included with Node.js |
+| MySQL | 8.0 or compatible |
+| Git | Latest |
+| XAMPP | Optional, for local MySQL and phpMyAdmin |
 
-## License
+You can check your installed versions:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php -v
+composer -V
+node -v
+npm -v
+git --version
+```
+
+## 4. Clone the Repository
+
+Open your terminal and run:
+
+```bash
+git clone https://github.com/hamsokhoeurn3-byte/TOS-TRAVEL-AGENCY.git
+```
+
+Go into the project:
+
+```bash
+cd TOS-TRAVEL-AGENCY
+```
+
+## 5. Configure the MySQL Database
+
+Start MySQL using XAMPP or your local MySQL installation.
+
+Open phpMyAdmin:
+
+```text
+http://localhost/phpmyadmin
+```
+
+Create a new database:
+
+```sql
+CREATE DATABASE tos_travel_agency_db
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
+
+## 6. Set Up the Laravel Backend
+
+Open a terminal in the project root:
+
+```bash
+cd backend
+```
+
+### Step 1: Install PHP dependencies
+
+```bash
+composer install
+```
+
+### Step 2: Create the environment file
+
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+### Step 3: Configure the database
+
+Open `backend/.env` and configure your MySQL connection:
+
+```env
+APP_NAME="TOS Travel Agency"
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=tos_travel_agency_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Change the database username and password if your local MySQL configuration is different.
+
+### Step 4: Generate the application key
+
+```bash
+php artisan key:generate
+```
+
+### Step 5: Run database migrations
+
+```bash
+php artisan migrate
+```
+
+This creates the database tables.
+
+**Important:** Do not use `php artisan migrate:fresh` on a database containing data. It deletes existing tables and their data.
+
+### Step 6: Start the Laravel server
+
+```bash
+php artisan serve
+```
+
+The backend will run at:
+
+```text
+http://127.0.0.1:8000
+```
+
+API base URL:
+
+```text
+http://127.0.0.1:8000/api
+```
+
+## 7. Set Up the React Frontend
+
+Open a second terminal.
+
+Go to the project root:
+
+```bash
+cd TOS-TRAVEL-AGENCY
+```
+
+Install frontend dependencies:
+
+```bash
+npm install
+```
+
+### Configure environment variables
+
+Create a frontend `.env` file if required by the application.
+
+The current frontend also uses Supabase for the AI Trip Planner. Configure the Supabase credentials using the exact variable names referenced in `src/lib/supabase.ts`.
+
+Example:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Also check the frontend API configuration and make sure its Laravel API base URL points to:
+
+```text
+http://127.0.0.1:8000/api
+```
+
+Use the exact environment variable name expected by the existing frontend code.
+
+### Start the frontend
+
+```bash
+npm run dev
+```
+
+Vite will display the local development URL, usually:
+
+```text
+http://localhost:5173
+```
+
+Open that address in your browser.
+
+## 8. Database Responsibilities
+
+The current application uses two database services:
+
+| Feature | Database |
+|---|---|
+| Tours | MySQL (Laravel) |
+| Tour details | MySQL (Laravel) |
+| Tour bookings | MySQL (Laravel) |
+| Hotels | MySQL (Laravel) |
+| Hotel details | MySQL (Laravel) |
+| Stay bookings | MySQL (Laravel) |
+| Transportation and other service requests | MySQL (Laravel) |
+| AI Trip Planner saved plans | Supabase |
+
+**Note:** Supabase has not yet been completely removed from the application. You need valid Supabase credentials to use the features that still depend on it.
+
+## 9. Available Laravel API Routes
+
+The current backend includes these API endpoints:
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/tours` | Get tours |
+| GET | `/api/tours/{slug}` | Get tour details |
+| POST | `/api/bookings` | Create a tour booking |
+| GET | `/api/hotels` | Get hotels |
+| GET | `/api/hotels/{slug}` | Get hotel details |
+| POST | `/api/stay-bookings` | Create a hotel booking |
+| POST | `/api/service-requests` | Submit a service request |
+
+## 10. Running the Full Application
+
+You need two terminals running at the same time.
+
+**Terminal 1 — Laravel backend**
+
+```bash
+cd backend
+php artisan serve
+```
+
+**Terminal 2 — React frontend**
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:5173
+```
+
+Make sure MySQL is running and both environment files are configured correctly.
+
+## 11. Useful Development Commands
+
+### Laravel
+
+```bash
+php artisan route:list --path=api
+php artisan migrate:status
+php artisan migrate
+php artisan optimize:clear
+php artisan config:clear
+```
+
+### React
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run preview
+```
+
+## 12. Troubleshooting
+
+### Database connection error
+
+Check:
+- MySQL is running.
+- Database `tos_travel_agency_db` exists.
+- Database credentials in `backend/.env` are correct.
+- Laravel configuration cache is cleared.
+
+```bash
+php artisan optimize:clear
+```
+
+### Frontend cannot connect to Laravel
+
+Check:
+- Laravel server is running.
+- API base URL is correct.
+- Laravel CORS configuration allows the frontend development URL.
+
+### Missing Laravel application key
+
+Run:
+
+```bash
+php artisan key:generate
+```
+
+### Missing frontend dependencies
+
+Run:
+
+```bash
+npm install
+```
+
+### Missing PHP dependencies
+
+Run:
+
+```bash
+composer install
+```
+
+## 13. Git Workflow
+
+To get the latest changes:
+
+```bash
+git pull origin main
+```
+
+To upload your changes:
+
+```bash
+git add -A
+git commit -m "Describe your changes"
+git push origin main
+```
+
+## 14. Security Notes
+
+- Never upload `.env` files.
+- Never publish database passwords.
+- Never publish private API keys or service credentials.
+- Keep `backend/.env` and frontend `.env` files local.
+- Use `.env.example` files to document required configuration variables.
+- Do not commit `vendor/` or `node_modules/`.
+
+## 15. Repository
+
+GitHub:
+
+https://github.com/hamsokhoeurn3-byte/TOS-TRAVEL-AGENCY
+
+---
+
+**TOS Travel Agency**
+
+Full-stack travel agency web application.
