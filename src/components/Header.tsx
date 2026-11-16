@@ -88,15 +88,22 @@ export default function Header() {
           <a
             href="#top"
             onClick={(event) => scrollToSection(event, '#top')}
-            className="flex items-center gap-3 rounded-xl bg-white p-1.5 pr-4 shadow-md"
+            className="flex items-center gap-3 py-1.5 pr-2"
           >
             <img
               src="/TOS_Travel_Agency_Logo.png?v=3"
               alt="TOS Travel Agency"
-              className="h-12 w-auto object-contain sm:h-14"
+              className="aspect-square h-14 w-14 shrink-0 object-contain mix-blend-multiply"
             />
-            <span className="whitespace-nowrap font-display text-sm font-bold tracking-tight text-brand-950 sm:text-base">
-              TOS Travel Agency
+            <span
+              className={`flex flex-col items-start font-display leading-tight ${
+                scrolled ? 'text-brand-950' : 'text-white'
+              }`}
+            >
+              <span className="text-sm font-bold tracking-wide sm:text-base">TOS</span>
+              <span className="text-[10px] font-semibold tracking-[0.12em] sm:text-xs">
+                TRAVEL AGENCY
+              </span>
             </span>
           </a>
 

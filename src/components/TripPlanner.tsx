@@ -115,6 +115,11 @@ export default function TripPlanner({ tours }: { tours: Tour[] }) {
   }
 
   async function savePlan() {
+    if (!supabase) {
+      setError('Add your Supabase URL and anon key to the frontend .env file to save plans.');
+      return;
+    }
+
     setSaving(true);
     setError('');
     const { error: err } = await supabase.from('trip_plans').insert({

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { BedDouble, CalendarDays, Moon, Users } from 'lucide-react';
 import { type Hotel } from '@/lib/supabase';
+import { API_URL } from '@/lib/api';
 import { isoPlus } from '@/lib/dates';
 import {
   ContactFields,
@@ -28,7 +29,6 @@ type Form = ContactValues & {
   message: string;
 };
 
-const API_URL = 'http://127.0.0.1:8000/api';
 
 const emptyForm: Form = {
   room_type: '',

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { CalendarDays, Users } from 'lucide-react';
 import type { Tour } from '@/lib/supabase';
+import { API_URL } from '@/lib/api';
 import { todayIso } from '@/lib/dates';
 import {
   BookingField,
@@ -13,7 +14,6 @@ import {
   type ContactValues,
 } from './BookingFormParts';
 
-const API_URL = 'http://127.0.0.1:8000/api';
 
 type Props = {
   tours: Tour[];

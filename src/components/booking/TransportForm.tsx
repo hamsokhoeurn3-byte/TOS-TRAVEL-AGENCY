@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { CalendarDays, Users } from 'lucide-react';
 import { todayIso } from '@/lib/dates';
+import { API_URL } from '@/lib/api';
 import {
   BookingField,
   ContactFields,
@@ -12,7 +13,6 @@ import {
   type ContactValues,
 } from './BookingFormParts';
 
-const API_URL = 'http://127.0.0.1:8000/api';
 
 const PRICE_PER_VEHICLE = 25;
 const GUESTS_PER_VEHICLE = 3;

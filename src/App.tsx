@@ -12,9 +12,9 @@ import TripPlanner from './components/TripPlanner';
 import Booking, { type BookingCategory } from './components/Booking';
 import Footer from './components/Footer';
 import type { Tour, Hotel } from './lib/supabase';
+import { API_URL } from './lib/api';
 import { Loader2, AlertCircle } from 'lucide-react';
 
-const API_URL = 'http://127.0.0.1:8000/api';
 
 export default function App() {
   const [tours, setTours] = useState<Tour[]>([]);
