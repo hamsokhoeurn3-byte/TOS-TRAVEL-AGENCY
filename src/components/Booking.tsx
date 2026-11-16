@@ -85,8 +85,8 @@ export default function Booking({
   const active = categories.find((c) => c.key === category) ?? categories[0];
 
   return (
-    <section id="booking" className="bg-clay-50 py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-8">
+    <section id="booking" className="bg-clay-50 py-16 sm:py-20">
+      <div className="mx-auto max-w-5xl px-4 sm:px-8">
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold-600">Booking</p>
           <h2 className="mt-3 font-display text-3xl font-bold text-brand-950 sm:text-4xl">Book Now</h2>
@@ -95,7 +95,7 @@ export default function Booking({
           </p>
         </Reveal>
 
-        <div role="tablist" className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div role="tablist" className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {categories.map((c) => {
             const isActive = c.key === category;
             const Icon = c.icon;
@@ -110,7 +110,7 @@ export default function Booking({
                   isActive ? 'border-gold-500 shadow-lg' : 'border-clay-100'
                 }`}
               >
-                <div className="relative h-24 overflow-hidden sm:h-32">
+                <div className="relative h-20 overflow-hidden sm:h-24">
                   <img
                     src={c.image}
                     alt=""
@@ -124,8 +124,8 @@ export default function Booking({
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-3 p-4">
-                  <Icon className="h-5 w-5 shrink-0 text-brand-700" />
+                <div className="flex items-center gap-2.5 p-3">
+                  <Icon className="h-4 w-4 shrink-0 text-brand-700" />
                   <span>
                     <span className="block text-sm font-bold text-brand-900">{c.title}</span>
                     <span className="block text-xs text-clay-500">{c.subtitle}</span>
@@ -136,17 +136,17 @@ export default function Booking({
           })}
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-3xl bg-white shadow-xl lg:grid lg:grid-cols-5">
-          <div className="relative h-56 overflow-hidden lg:col-span-2 lg:h-auto">
+        <div className="mt-5 overflow-hidden rounded-2xl bg-white shadow-lg lg:grid lg:grid-cols-5">
+          <div className="relative h-40 overflow-hidden lg:col-span-2 lg:h-auto">
             <img src={active.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/40 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-8 lg:p-10">
-              <h3 className="font-display text-2xl font-bold text-white">{active.panelTitle}</h3>
+            <div className="absolute inset-x-0 bottom-0 p-6 lg:p-8">
+              <h3 className="font-display text-xl font-bold text-white">{active.panelTitle}</h3>
               <p className="mt-2 text-sm leading-relaxed text-white/85">{active.panelText}</p>
             </div>
           </div>
 
-          <div className="p-8 sm:p-10 lg:col-span-3">
+          <div className="p-6 sm:p-8 lg:col-span-3">
             {category === 'accommodation' && (
               <AccommodationForm hotels={hotels} selectedHotel={selectedHotel} onChangeHotel={onChangeHotel} />
             )}

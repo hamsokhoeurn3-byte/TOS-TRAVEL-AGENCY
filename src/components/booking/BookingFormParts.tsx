@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 
 export const inputClass =
-  'w-full rounded-xl border border-clay-200 bg-white px-4 py-3 text-sm text-clay-900 placeholder:text-clay-400 outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-200';
+  'w-full rounded-lg border border-clay-200 bg-white px-3 py-2.5 text-sm text-clay-900 placeholder:text-clay-400 outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-200';
 
 const labelClass = 'mb-1.5 block text-xs font-semibold text-clay-700';
 
@@ -25,7 +25,7 @@ export function ContactFields({
   onChange: (key: keyof ContactValues, value: string) => void;
 }) {
   return (
-    <div className="grid gap-5 sm:grid-cols-2">
+    <div className="grid gap-4 sm:grid-cols-2">
       <BookingField label="Full name">
         <input
           type="text"
@@ -64,9 +64,9 @@ export function ContactFields({
 
 export function TotalBar({ label, amount }: { label: string; amount: number }) {
   return (
-    <div className="flex items-center justify-between rounded-xl bg-brand-900 px-5 py-4">
+    <div className="flex items-center justify-between rounded-xl bg-brand-900 px-4 py-3">
       <span className="text-sm font-medium text-brand-100">{label}</span>
-      <span className="font-display text-2xl font-bold text-gold-400">${amount}</span>
+      <span className="font-display text-xl font-bold text-gold-400">${amount}</span>
     </div>
   );
 }
@@ -85,7 +85,7 @@ export function SubmitButton({
       <button
         type="submit"
         disabled={submitting}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-gold-500 py-3.5 font-semibold text-brand-950 shadow-md transition-all hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-gold-500 py-3 font-semibold text-brand-950 shadow-md transition-all hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
         {submitting ? submittingLabel : label}

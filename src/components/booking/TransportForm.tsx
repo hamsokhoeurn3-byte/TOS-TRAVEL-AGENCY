@@ -139,8 +139,8 @@ export default function TransportForm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5">
-      <div className="grid gap-5 sm:grid-cols-2">
+    <form onSubmit={submit} className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <BookingField
           label={
             <span className="inline-flex items-center gap-1">

@@ -71,11 +71,11 @@ export default function Header() {
           scrolled ? 'h-0 overflow-hidden opacity-0' : 'h-9 opacity-100'
         } bg-brand-950 text-brand-100`}
       >
-        <a href="tel:+85578555518" className="flex items-center gap-1.5 hover:text-white transition-colors">
-          <Phone className="h-3 w-3" /> +855 (0)78 555 518
+        <a href="https://wa.me/85587762902" className="flex items-center gap-1.5 hover:text-white transition-colors">
+          <Phone className="h-3 w-3" /> +855 (0)87 762 902
         </a>
-        <a href="mailto:booking@siemreapshuttle.com" className="flex items-center gap-1.5 hover:text-white transition-colors">
-          <Mail className="h-3 w-3" /> booking@siemreapshuttle.com
+        <a href="mailto:hamsokhoeurn3@gmail.com" className="flex items-center gap-1.5 hover:text-white transition-colors">
+          <Mail className="h-3 w-3" /> hamsokhoeurn3@gmail.com
         </a>
       </div>
 

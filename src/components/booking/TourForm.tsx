@@ -127,7 +127,7 @@ export default function TourForm({ tours, selectedTour, onChangeTour }: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5">
+    <form onSubmit={submit} className="space-y-4">
       <BookingField label="Choose your tour">
         <select
           value={tour?.slug ?? ''}
@@ -143,7 +143,7 @@ export default function TourForm({ tours, selectedTour, onChangeTour }: Props) {
         </select>
       </BookingField>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <BookingField
           label={
             <span className="inline-flex items-center gap-1">

@@ -138,7 +138,7 @@ export default function ServiceForm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5">
+    <form onSubmit={submit} className="space-y-4">
       <BookingField label="Choose an experience">
         <select
           value={form.service_name}
@@ -153,7 +153,7 @@ export default function ServiceForm() {
         </select>
       </BookingField>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <BookingField
           label={
             <span className="inline-flex items-center gap-1">
