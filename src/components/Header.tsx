@@ -5,7 +5,7 @@ import { useScrolled } from './Reveal';
 const links = [
   { label: 'Home', href: '#top' },
   { label: 'Where to Stay', href: '#stay' },
-  { label: 'Tours', href: '#tours' },
+  { label: 'Tours & Activities', href: '#tours' },
   { label: 'Transportation', href: '#transportation' },
   { label: 'Trip Planner', href: '#planner' },
   { label: 'Reviews', href: '#reviews' },

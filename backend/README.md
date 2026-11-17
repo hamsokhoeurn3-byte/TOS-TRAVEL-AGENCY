@@ -43,7 +43,6 @@ TOS-TRAVEL-AGENCY/
 
 ### Databases
 - MySQL — Laravel application data
-- Supabase — AI Trip Planner data (still used by the current project)
 
 ## 3. Requirements
 
@@ -198,15 +197,6 @@ npm install
 
 Create a frontend `.env` file if required by the application.
 
-The current frontend also uses Supabase for the AI Trip Planner. Configure the Supabase credentials using the exact variable names referenced in `src/lib/supabase.ts`.
-
-Example:
-
-```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
 Also check the frontend API configuration and make sure its Laravel API base URL points to:
 
 ```text
@@ -231,7 +221,7 @@ Open that address in your browser.
 
 ## 8. Database Responsibilities
 
-The current application uses two database services:
+The application stores its data in the Laravel MySQL database, which can be managed through phpMyAdmin:
 
 | Feature | Database |
 |---|---|
@@ -242,9 +232,7 @@ The current application uses two database services:
 | Hotel details | MySQL (Laravel) |
 | Stay bookings | MySQL (Laravel) |
 | Transportation and other service requests | MySQL (Laravel) |
-| AI Trip Planner saved plans | Supabase |
-
-**Note:** Supabase has not yet been completely removed from the application. You need valid Supabase credentials to use the features that still depend on it.
+| AI Trip Planner saved plans | MySQL (Laravel) |
 
 ## 9. Available Laravel API Routes
 
@@ -259,6 +247,7 @@ The current backend includes these API endpoints:
 | GET | `/api/hotels/{slug}` | Get hotel details |
 | POST | `/api/stay-bookings` | Create a hotel booking |
 | POST | `/api/service-requests` | Submit a service request |
+| POST | `/api/trip-plans` | Save an AI Trip Planner itinerary |
 
 ## 10. Running the Full Application
 

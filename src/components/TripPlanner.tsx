@@ -12,7 +12,8 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
-import { supabase, type Tour } from '../lib/supabase';
+import type { Tour } from '../lib/types';
+import { API_URL } from '../lib/api';
 import { Reveal } from './Reveal';
 
 type Preferences = {
@@ -115,30 +116,35 @@ export default function TripPlanner({ tours }: { tours: Tour[] }) {
   }
 
   async function savePlan() {
-    if (!supabase) {
-      setError('Add your Supabase URL and anon key to the frontend .env file to save plans.');
-      return;
-    }
-
     setSaving(true);
     setError('');
-    const { error: err } = await supabase.from('trip_plans').insert({
-      trip_name: `${prefs.days}-day ${interestLabels[prefs.interest].toLowerCase()} trip`,
-      days: plan.map((d) => ({
-        day: d.day,
-        label: d.label,
-        tours: d.tours.map((t) => ({ name: t.name, slug: t.slug, price: t.price })),
-      })),
-      total_price: totalPrice,
-      travelers: prefs.travelers,
-      pace: prefs.pace,
-    });
-    setSaving(false);
-    if (err) {
+    try {
+      const response = await fetch(`${API_URL}/trip-plans`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          trip_name: `${prefs.days}-day ${interestLabels[prefs.interest].toLowerCase()} trip`,
+          days: plan.map((d) => ({
+            day: d.day,
+            label: d.label,
+            tours: d.tours.map((t) => ({ name: t.name, slug: t.slug, price: t.price })),
+          })),
+          total_price: totalPrice,
+          travelers: prefs.travelers,
+          pace: prefs.pace,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('The server could not save your itinerary. Please try again.');
+      }
+
+      setSaved(true);
+    } catch {
       setError('Your plan could not be saved just now. You can still use it on screen.');
-      return;
+    } finally {
+      setSaving(false);
     }
-    setSaved(true);
   }
 
   function restart() {
@@ -181,11 +187,10 @@ export default function TripPlanner({ tours }: { tours: Tour[] }) {
                     <button
                       key={d}
                       onClick={() => setPrefs({ ...prefs, days: d })}
-                      className={`rounded-2xl border-2 py-6 text-center transition-all ${
-                        prefs.days === d
+                      className={`rounded-2xl border-2 py-6 text-center transition-all ${prefs.days === d
                           ? 'border-brand-600 bg-brand-50 text-brand-800 shadow-md'
                           : 'border-clay-100 text-clay-600 hover:border-brand-200'
-                      }`}
+                        }`}
                     >
                       <span className="block font-display text-3xl font-bold">{d}</span>
                       <span className="text-xs font-medium">{d === 1 ? 'day' : 'days'}</span>
@@ -220,11 +225,10 @@ export default function TripPlanner({ tours }: { tours: Tour[] }) {
                     <button
                       key={key}
                       onClick={() => setPrefs({ ...prefs, interest: key })}
-                      className={`rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-all ${
-                        prefs.interest === key
+                      className={`rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-all ${prefs.interest === key
                           ? 'border-brand-600 bg-brand-50 text-brand-800 shadow-md'
                           : 'border-clay-100 text-clay-600 hover:border-brand-200'
-                      }`}
+                        }`}
                     >
                       {interestLabels[key]}
                     </button>

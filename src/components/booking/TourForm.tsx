@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { CalendarDays, Users } from 'lucide-react';
-import type { Tour } from '@/lib/supabase';
+import type { Tour } from '@/lib/types';
 import { API_URL } from '@/lib/api';
 import { todayIso } from '@/lib/dates';
 import {

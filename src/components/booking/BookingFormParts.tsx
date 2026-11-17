@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 
 export const inputClass =
-  'w-full rounded-lg border border-clay-200 bg-white px-3 py-2.5 text-sm text-clay-900 placeholder:text-clay-400 outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-200';
+  'w-full rounded-lg border border-clay-200 bg-white px-3 py-2 text-sm text-clay-900 placeholder:text-clay-400 outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-200';
 
-const labelClass = 'mb-1.5 block text-xs font-semibold text-clay-700';
+const labelClass = 'mb-1 block text-xs font-semibold text-clay-700';
 
 export function BookingField({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
