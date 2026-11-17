@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { MapPin, Star, Wifi, Coffee, Car, ExternalLink, ArrowRight, BedDouble, Users, X as CloseIcon, Quote } from 'lucide-react';
-import type { Hotel } from '../lib/supabase';
+import { roomTypeGuests, roomTypeName, roomTypePrice, type Hotel } from '../lib/types';
 import { Reveal } from './Reveal';
-
-const AIRBNB_URL =
-  'https://www.airbnb.com/s/Siem-Reap/homes?place_id=ChIJ9aDUBwsXEDERuaxzznDT210&refinement_paths%5B%5D=%2Fhomes&date_picker_type=calendar';
+import StayRoomDetails from './StayRoomDetails';
 
 const TOP_RATING = 4.2;
 
@@ -61,8 +59,9 @@ const roomGuestMap: Record<string, number> = {
   'Private Twin': 2,
 };
 
-function roomGuests(roomType: string): number {
-  return roomGuestMap[roomType] ?? 2;
+function roomGuests(roomType: Hotel['room_types'][number]): number {
+  const name = roomTypeName(roomType);
+  return roomTypeGuests(roomType, roomGuestMap[name] ?? 2);
 }
 
 type HotelReview = {
@@ -178,21 +177,24 @@ const hotelReviews: Record<string, HotelReview[]> = {
   ],
 };
 
-function HotelModal({ hotel, onClose, onBook }: { hotel: Hotel; onClose: () => void; onBook: (hotel: Hotel) => void }) {
-  const [guestFilter, setGuestFilter] = useState<number | 'all'>('all');
-
-  const guestOptions: Array<{ key: number | 'all'; label: string }> = [
-    { key: 'all', label: 'All rooms' },
-    { key: 2, label: '2+ guests' },
-    { key: 3, label: '3+ guests' },
-    { key: 4, label: '4+ guests' },
-  ];
-
-  const filteredRooms =
-    guestFilter === 'all'
-      ? hotel.room_types
-      : hotel.room_types.filter((r) => roomGuests(r) >= guestFilter);
+function HotelModal({ hotel, onClose, onBook }: { hotel: Hotel; onClose: () => void; onBook: (hotel: Hotel, roomType: string) => void }) {
+  const [selectedRoom, setSelectedRoom] = useState(roomTypeName(hotel.room_types[0] ?? ''));
+  const [roomDetailsOpen, setRoomDetailsOpen] = useState(false);
   const reviews = hotelReviews[hotel.slug] ?? [];
+
+  if (roomDetailsOpen && selectedRoom) {
+    return (
+      <StayRoomDetails
+        hotel={hotel}
+        roomType={selectedRoom}
+        onBack={() => setRoomDetailsOpen(false)}
+        onBook={() => {
+          onClose();
+          onBook(hotel, selectedRoom);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center" role="dialog" aria-modal="true">
@@ -229,40 +231,52 @@ function HotelModal({ hotel, onClose, onBook }: { hotel: Hotel; onClose: () => v
             <span className="flex items-center gap-1"><Car className="h-3.5 w-3.5" /> Tour pickup</span>
           </div>
 
-          <h4 className="mt-6 text-sm font-bold uppercase tracking-wider text-clay-500">Room Types</h4>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {guestOptions.map((o) => (
+          <h4 className="mt-6 text-sm font-bold uppercase tracking-wider text-clay-500">Rooms, Suites &amp; Villas</h4>
+          {hotel.room_types.length > 0 ? (
+            <>
+              <div role="radiogroup" aria-label="Choose a room or villa type" className="mt-3 space-y-4">
+                {(['room', 'villa'] as const).map((category) => {
+                  const options = hotel.room_types.filter((r) => typeof r === 'string' ? category === 'room' : (r.category ?? 'room') === category);
+                  if (options.length === 0) return null;
+                  return <section key={category}>
+                    <h5 className="mb-2 text-xs font-bold uppercase tracking-wider text-clay-500">{category === 'villa' ? 'Pool Villas' : 'Rooms & Suites'}</h5>
+                    <ul className="space-y-2.5">
+                {options.map((r) => {
+                  const name = roomTypeName(r);
+                  return <li key={name}>
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={selectedRoom === name}
+                      onClick={() => setSelectedRoom(name)}
+                      className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-colors ${selectedRoom === name ? 'bg-brand-50 ring-2 ring-brand-600' : 'bg-clay-50 hover:bg-brand-50/60'}`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <BedDouble className="h-4 w-4 shrink-0 text-brand-600" />
+                        <span className="text-sm font-semibold text-brand-900">{name}</span>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-clay-600">
+                        <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {roomGuests(r)} guests</span>
+                        <span className="font-bold text-brand-800">${roomTypePrice(r, hotel.price_from)}<span className="font-normal text-clay-400"> /night</span></span>
+                      </div>
+                    </button>
+                  </li>;
+                })}
+                    </ul>
+                  </section>;
+                })}
+              </div>
               <button
-                key={o.key}
-                onClick={() => setGuestFilter(o.key)}
-                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
-                  guestFilter === o.key
-                    ? 'bg-brand-700 text-white shadow-sm'
-                    : 'bg-clay-50 text-clay-700 hover:bg-brand-50'
-                }`}
+                type="button"
+                onClick={() => setRoomDetailsOpen(true)}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-brand-200 py-2.5 text-sm font-semibold text-brand-800 transition-colors hover:bg-brand-50"
               >
-                {o.label}
+                View {selectedRoom} photos and details <ArrowRight className="h-4 w-4" />
               </button>
-            ))}
-          </div>
-          {filteredRooms.length > 0 ? (
-            <ul className="mt-3 space-y-2.5">
-              {filteredRooms.map((r) => (
-                <li key={r} className="flex items-center justify-between rounded-xl bg-clay-50 px-4 py-3">
-                  <div className="flex items-center gap-2.5">
-                    <BedDouble className="h-4 w-4 shrink-0 text-brand-600" />
-                    <span className="text-sm font-semibold text-brand-900">{r}</span>
-                  </div>
-                  <div className="flex items-center gap-4 text-xs text-clay-600">
-                    <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {roomGuests(r)} guests</span>
-                    <span className="font-bold text-brand-800">${hotel.price_from}<span className="font-normal text-clay-400"> /night</span></span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            </>
           ) : (
             <p className="mt-4 rounded-xl bg-clay-50 px-4 py-6 text-center text-sm text-clay-500">
-              No room types match that guest count. Try a different filter.
+              No room types are currently available.
             </p>
           )}
 
@@ -304,7 +318,7 @@ function HotelModal({ hotel, onClose, onBook }: { hotel: Hotel; onClose: () => v
           <button
             onClick={() => {
               onClose();
-              onBook(hotel);
+              onBook(hotel, selectedRoom);
             }}
             className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-brand-700 py-3.5 font-semibold text-white transition-all hover:bg-brand-600"
           >
@@ -321,7 +335,7 @@ export default function Stay({
   onStay,
 }: {
   hotels: Hotel[];
-  onStay: (hotel: Hotel) => void;
+  onStay: (hotel: Hotel, roomType: string) => void;
 }) {
   const [filter, setFilter] = useState<'all' | Hotel['price_level']>('all');
   const [selected, setSelected] = useState<Hotel | null>(null);
@@ -395,27 +409,30 @@ export default function Stay({
                   <p className="mt-3 text-xs font-medium text-clay-500">{h.style}</p>
                   {h.room_types.length > 0 && (
                     <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-brand-700">
-                      <BedDouble className="h-3.5 w-3.5" /> {h.room_types.length} room type{h.room_types.length > 1 ? 's' : ''}
+                      <BedDouble className="h-3.5 w-3.5" /> {h.slug === 'shintamani-angkor' ? '5 room types · 1 pool villa type' : h.slug === 'raffles-grand-hotel-angkor' ? '6 room types · 1 villa type' : `${h.room_types.length} room type${h.room_types.length > 1 ? 's' : ''}`}
                     </p>
                   )}
-                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-clay-100 pt-4">
-                    <div>
-                      <span className="font-display text-2xl font-bold text-brand-800">${h.price_from}</span>
-                      <span className="text-xs text-clay-500"> / night from</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <a
-                        href={AIRBNB_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label={`Browse ${h.name} options on Airbnb`}
-                        className="flex items-center gap-1 text-xs font-bold text-[#FF385C] transition-colors hover:text-[#d9274b]"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" /> Airbnb
-                      </a>
-                      <span className="flex items-center gap-1 text-sm font-semibold text-gold-600 transition-all group-hover:gap-2">
-                        View Details <ArrowRight className="h-4 w-4" />
+                  <div className="mt-5 flex items-center justify-between gap-2 border-t border-clay-100 pt-4">
+                    <p className="flex shrink-0 items-baseline gap-1 whitespace-nowrap">
+                      <span className="text-[10px] font-semibold text-clay-500">From</span>
+                      <span className="font-display text-xl font-bold leading-none text-brand-800">${h.price_from}</span>
+                      <span className="text-[10px] text-clay-500">/ night</span>
+                    </p>
+                    <div className="flex min-w-0 items-center gap-2">
+                      {h.website_url && (
+                        <a
+                          href={h.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(event) => event.stopPropagation()}
+                          aria-label={`Visit ${h.name} website`}
+                          className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[11px] font-bold text-[#003B95] transition-colors hover:text-[#002b70]"
+                        >
+                          <ExternalLink className="h-3 w-3" /> {h.slug === 'golden-temple-residence' ? 'Booking.com' : 'Website'}
+                        </a>
+                      )}
+                      <span className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap text-[11px] font-bold text-gold-700">
+                        View Details <ArrowRight className="h-3.5 w-3.5" />
                       </span>
                     </div>
                   </div>

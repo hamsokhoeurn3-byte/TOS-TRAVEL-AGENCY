@@ -11,7 +11,7 @@ import Stay from './components/Stay';
 import TripPlanner from './components/TripPlanner';
 import Booking, { type BookingCategory } from './components/Booking';
 import Footer from './components/Footer';
-import type { Tour, Hotel } from './lib/supabase';
+import type { Tour, Hotel } from './lib/types';
 import { API_URL } from './lib/api';
 import { Loader2, AlertCircle } from 'lucide-react';
 
@@ -21,6 +21,7 @@ export default function App() {
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [stayHotel, setStayHotel] = useState<Hotel | null>(null);
+  const [stayRoomType, setStayRoomType] = useState('');
   const [bookingCategory, setBookingCategory] = useState<BookingCategory>('tours');
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
@@ -74,8 +75,9 @@ export default function App() {
     scrollToBooking();
   }
 
-  function bookStay(hotel: Hotel) {
+  function bookStay(hotel: Hotel, roomType: string) {
     setStayHotel(hotel);
+    setStayRoomType(roomType);
     setBookingCategory('accommodation');
     scrollToBooking();
   }
@@ -121,6 +123,7 @@ export default function App() {
               selectedTour={selectedTour}
               onChangeTour={changeTour}
               selectedHotel={stayHotel}
+              selectedRoomType={stayRoomType}
               onChangeHotel={setStayHotel}
             />
 

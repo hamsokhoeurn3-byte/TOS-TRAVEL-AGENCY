@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { BedDouble, CalendarDays, Moon, Users } from 'lucide-react';
-import { type Hotel } from '@/lib/supabase';
+import { roomTypeName, roomTypePrice, type Hotel } from '@/lib/types';
 import { API_URL } from '@/lib/api';
 import { isoPlus } from '@/lib/dates';
 import {
@@ -17,6 +17,7 @@ import {
 type Props = {
   hotels: Hotel[];
   selectedHotel: Hotel | null;
+  selectedRoomType: string;
   onChangeHotel: (hotel: Hotel | null) => void;
 };
 
@@ -45,6 +46,7 @@ const emptyForm: Form = {
 export default function AccommodationForm({
   hotels,
   selectedHotel,
+  selectedRoomType,
   onChangeHotel,
 }: Props) {
   const [form, setForm] = useState<Form>(emptyForm);
@@ -52,6 +54,12 @@ export default function AccommodationForm({
     'idle' | 'submitting' | 'done' | 'error'
   >('idle');
   const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    if (selectedRoomType) {
+      setForm((current) => ({ ...current, room_type: selectedRoomType }));
+    }
+  }, [selectedRoomType]);
 
   const nights =
     form.check_in && form.check_out
@@ -65,8 +73,12 @@ export default function AccommodationForm({
         )
       : 0;
 
+  const selectedRoom = selectedHotel?.room_types.find((room) => roomTypeName(room) === form.room_type);
+  const nightlyPrice = selectedHotel
+    ? selectedRoom ? roomTypePrice(selectedRoom, selectedHotel.price_from) : selectedHotel.price_from
+    : 0;
   const estimate = selectedHotel
-    ? selectedHotel.price_from * nights * form.rooms
+    ? nightlyPrice * nights * form.rooms
     : 0;
 
   function setField<K extends keyof Form>(key: K, value: Form[K]) {
@@ -171,8 +183,8 @@ export default function AccommodationForm({
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <form onSubmit={submit} className="space-y-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <BookingField label="Choose your stay">
           <select
             required
@@ -207,15 +219,15 @@ export default function AccommodationForm({
           >
             <option value="">Any room type</option>
             {selectedHotel?.room_types.map((r) => (
-              <option key={r} value={r}>
-                {r}
+              <option key={roomTypeName(r)} value={roomTypeName(r)}>
+                {roomTypeName(r)} — ${roomTypePrice(r, selectedHotel.price_from)} / night
               </option>
             ))}
           </select>
         </BookingField>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <BookingField
           label={
             <span className="inline-flex items-center gap-1">
@@ -253,7 +265,7 @@ export default function AccommodationForm({
         </BookingField>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <BookingField
           label={
             <span className="inline-flex items-center gap-1">
@@ -307,7 +319,7 @@ export default function AccommodationForm({
         }
       >
         <textarea
-          rows={3}
+          rows={2}
           placeholder="Airport pickup, special requests..."
           value={form.message}
           onChange={(e) => setField('message', e.target.value)}
@@ -317,7 +329,7 @@ export default function AccommodationForm({
 
       {selectedHotel && nights > 0 && (
         <TotalBar
-          label={`$${selectedHotel.price_from} × ${nights} night${nights === 1 ? '' : 's'} × ${form.rooms} room${form.rooms > 1 ? 's' : ''}`}
+          label={`$${nightlyPrice} × ${nights} night${nights === 1 ? '' : 's'} × ${form.rooms} room${form.rooms > 1 ? 's' : ''}`}
           amount={estimate}
         />
       )}

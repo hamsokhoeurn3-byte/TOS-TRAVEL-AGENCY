@@ -8,9 +8,22 @@ use Illuminate\Http\JsonResponse;
 
 class HotelController extends Controller
 {
+    private const KEPT_BUDGET_SLUGS = [
+        'motherhome-guesthouse',
+        'le-nou-siemreap-guesthouse',
+        'golden-takeo-guesthouse',
+        'prohm-roth-guesthouse',
+        'sam-so-guesthouse',
+        'sweet-dreams-guesthouse',
+    ];
+
     public function index(): JsonResponse
     {
         $hotels = Hotel::query()
+            ->where(function ($query) {
+                $query->where('price_level', '!=', 'budget')
+                    ->orWhereIn('slug', self::KEPT_BUDGET_SLUGS);
+            })
             ->orderBy('sort_order')
             ->get();
 
@@ -22,7 +35,13 @@ class HotelController extends Controller
 
     public function show(string $slug): JsonResponse
     {
-        $hotel = Hotel::where('slug', $slug)->first();
+        $hotel = Hotel::query()
+            ->where('slug', $slug)
+            ->where(function ($query) {
+                $query->where('price_level', '!=', 'budget')
+                    ->orWhereIn('slug', self::KEPT_BUDGET_SLUGS);
+            })
+            ->first();
 
         if (! $hotel) {
             return response()->json([
