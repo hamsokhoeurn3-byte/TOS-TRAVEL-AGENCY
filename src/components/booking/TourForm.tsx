@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { CalendarDays, Users } from 'lucide-react';
 import type { Tour } from '@/lib/types';
 import { API_URL } from '@/lib/api';
@@ -38,11 +38,24 @@ const emptyForm: Form = {
 
 export default function TourForm({ tours, selectedTour, onChangeTour }: Props) {
   const [form, setForm] = useState<Form>(emptyForm);
+  const [vehicleOptionId, setVehicleOptionId] = useState('');
   const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
 
   const tour = selectedTour ?? tours[0];
-  const total = tour ? tour.price * form.guests : 0;
+  const vehicleOptions = tour?.vehicle_options ?? [];
+  const vehicleOption = vehicleOptions.find((option) => option.id === vehicleOptionId) ?? vehicleOptions[0];
+  const guestLimit = vehicleOption?.capacity ?? tour?.group_size ?? undefined;
+  const total = tour
+    ? tour.price_basis === 'group'
+      ? vehicleOption?.price ?? tour.price
+      : tour.price * form.guests
+    : 0;
+
+  useEffect(() => {
+    setVehicleOptionId(tour?.vehicle_options?.[0]?.id ?? '');
+    setForm((current) => ({ ...current, guests: tour?.group_size ? Math.min(current.guests, tour.group_size) : current.guests }));
+  }, [tour?.slug]);
 
   function setField<K extends keyof Form>(key: K, value: Form[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -81,6 +94,7 @@ export default function TourForm({ tours, selectedTour, onChangeTour }: Props) {
           email: form.email.trim(),
           phone: form.phone.trim(),
           hotel_name: form.hotel_name.trim() || null,
+          vehicle_option: vehicleOption?.id ?? null,
         }),
       });
 
@@ -137,11 +151,32 @@ export default function TourForm({ tours, selectedTour, onChangeTour }: Props) {
         >
           {tours.map((t) => (
             <option key={t.slug} value={t.slug}>
-              {t.name} — ${t.price} / person
+              {t.name} — ${t.price} / {t.price_basis === 'group' ? (t.vehicle_options?.length ? 'vehicle' : 'group') : 'person'}
             </option>
           ))}
         </select>
       </BookingField>
+
+      {vehicleOptions.length > 0 && (
+        <BookingField label="Choose your private vehicle">
+          <select
+            value={vehicleOption?.id ?? ''}
+            onChange={(event) => {
+              const option = vehicleOptions.find((item) => item.id === event.target.value);
+              setVehicleOptionId(event.target.value);
+              if (option) setForm((current) => ({ ...current, guests: Math.min(current.guests, option.capacity) }));
+            }}
+            className={inputClass}
+            required
+          >
+            {vehicleOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.name} · up to {option.capacity} guests · ${option.price} total
+              </option>
+            ))}
+          </select>
+        </BookingField>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <BookingField
@@ -164,7 +199,7 @@ export default function TourForm({ tours, selectedTour, onChangeTour }: Props) {
         <BookingField
           label={
             <span className="inline-flex items-center gap-1">
-              <Users className="h-3.5 w-3.5" /> Guests (max {tour?.group_size ?? 10})
+              <Users className="h-3.5 w-3.5" /> {tour?.price_basis === 'group' ? 'Guests in your group' : 'Seats to book'}{guestLimit ? ` (max ${guestLimit})` : ''}
             </span>
           }
         >
@@ -172,7 +207,7 @@ export default function TourForm({ tours, selectedTour, onChangeTour }: Props) {
             type="number"
             required
             min={1}
-            max={tour?.group_size ?? 10}
+            max={guestLimit}
             value={form.guests}
             onChange={(e) => setField('guests', Number(e.target.value))}
             className={inputClass}
@@ -203,7 +238,7 @@ export default function TourForm({ tours, selectedTour, onChangeTour }: Props) {
 
       {tour && (
         <TotalBar
-          label={`$${tour.price} × ${form.guests} guest${form.guests > 1 ? 's' : ''}`}
+          label={tour.price_basis === 'group' ? `$${total} fixed price for your ${vehicleOption ? vehicleOption.name : 'private group'}` : `$${tour.price} × ${form.guests} seat${form.guests > 1 ? 's' : ''}`}
           amount={total}
         />
       )}

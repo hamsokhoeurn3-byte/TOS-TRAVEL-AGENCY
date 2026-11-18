@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { BedDouble, CalendarDays, Moon, Users } from 'lucide-react';
-import { roomTypeName, roomTypePrice, type Hotel } from '@/lib/types';
+import { roomTypeName, roomTypePrice, roomTypePriceLabel, type Hotel } from '@/lib/types';
 import { API_URL } from '@/lib/api';
 import { isoPlus } from '@/lib/dates';
 import {
@@ -220,7 +220,7 @@ export default function AccommodationForm({
             <option value="">Any room type</option>
             {selectedHotel?.room_types.map((r) => (
               <option key={roomTypeName(r)} value={roomTypeName(r)}>
-                {roomTypeName(r)} — ${roomTypePrice(r, selectedHotel.price_from)} / night
+                {roomTypeName(r)} — {roomTypePriceLabel(r, selectedHotel.price_from)} / night
               </option>
             ))}
           </select>

@@ -12,8 +12,6 @@ class HotelController extends Controller
         'motherhome-guesthouse',
         'le-nou-siemreap-guesthouse',
         'golden-takeo-guesthouse',
-        'prohm-roth-guesthouse',
-        'sam-so-guesthouse',
         'sweet-dreams-guesthouse',
     ];
 

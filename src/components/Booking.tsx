@@ -1,10 +1,12 @@
-import { BedDouble, Car, Check, Landmark, Star, type LucideIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { BedDouble, Bike, Car, Check, Landmark, Star, type LucideIcon } from 'lucide-react';
 import type { Hotel, Tour } from '@/lib/types';
 import { Reveal } from './Reveal';
 import AccommodationForm from './booking/AccommodationForm';
 import TourForm from './booking/TourForm';
 import TransportForm from './booking/TransportForm';
 import ServiceForm from './booking/ServiceForm';
+import type { BicycleRental, RentalBike } from './Transportation';
 
 export type BookingCategory = 'accommodation' | 'tours' | 'transportation' | 'other';
 
@@ -61,6 +63,38 @@ const categories: Category[] = [
   },
 ];
 
+function BookingPanelImage({ source, backup }: { source: string; backup?: string }) {
+  const [image, setImage] = useState(source);
+  const [triedBackup, setTriedBackup] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setImage(source);
+    setTriedBackup(false);
+    setFailed(false);
+  }, [source, backup]);
+
+  if (failed) {
+    return <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-brand-800 to-brand-950 text-white/75"><Bike className="h-16 w-16" aria-hidden="true" /></div>;
+  }
+
+  return (
+    <img
+      src={image}
+      alt=""
+      className="absolute inset-0 h-full w-full object-cover"
+      onError={() => {
+        if (backup && !triedBackup) {
+          setTriedBackup(true);
+          setImage(backup);
+        } else {
+          setFailed(true);
+        }
+      }}
+    />
+  );
+}
+
 type Props = {
   tours: Tour[];
   hotels: Hotel[];
@@ -71,6 +105,8 @@ type Props = {
   selectedHotel: Hotel | null;
   selectedRoomType: string;
   onChangeHotel: (hotel: Hotel | null) => void;
+  selectedRental: RentalBike | null;
+  selectedBicycle: BicycleRental | null;
 };
 
 export default function Booking({
@@ -83,8 +119,30 @@ export default function Booking({
   selectedHotel,
   selectedRoomType,
   onChangeHotel,
+  selectedRental,
+  selectedBicycle,
 }: Props) {
   const active = categories.find((c) => c.key === category) ?? categories[0];
+  const panelTitle = category === 'transportation' && selectedRental
+    ? 'Request a Motor Rental'
+    : category === 'transportation' && selectedBicycle
+      ? 'Request a Bicycle Rental'
+      : active.panelTitle;
+  const panelText = category === 'transportation' && selectedRental
+    ? `Request ${selectedRental.name} for $${selectedRental.price} per 24-hour day. We’ll confirm availability and the final rental terms with you.`
+    : category === 'transportation' && selectedBicycle
+      ? `Request ${selectedBicycle.brand} ${selectedBicycle.name} for $${selectedBicycle.price} per day. We’ll confirm availability and bike sizing with you.`
+      : active.panelText;
+  const panelImage = category === 'transportation' && selectedRental
+    ? selectedRental.image
+    : category === 'transportation' && selectedBicycle
+      ? selectedBicycle.image
+      : active.image;
+  const panelImageBackup = category === 'transportation' && selectedRental
+    ? selectedRental.backupImage
+    : category === 'transportation' && selectedBicycle
+      ? selectedBicycle.backupImage
+      : undefined;
 
   return (
     <section id="booking" className="bg-clay-50 py-12 sm:py-16">
@@ -140,11 +198,11 @@ export default function Booking({
 
         <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-lg lg:grid lg:grid-cols-5">
           <div className="relative h-28 overflow-hidden lg:col-span-2 lg:h-full lg:min-h-[430px]">
-            <img src={active.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <BookingPanelImage source={panelImage} backup={panelImageBackup} />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/40 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-4 lg:p-6">
-              <h3 className="font-display text-lg font-bold text-white">{active.panelTitle}</h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-white/85">{active.panelText}</p>
+              <h3 className="font-display text-lg font-bold text-white">{panelTitle}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-white/85">{panelText}</p>
             </div>
           </div>
 
@@ -155,7 +213,7 @@ export default function Booking({
             {category === 'tours' && (
               <TourForm tours={tours} selectedTour={selectedTour} onChangeTour={onChangeTour} />
             )}
-            {category === 'transportation' && <TransportForm />}
+            {category === 'transportation' && <TransportForm rental={selectedRental} bicycle={selectedBicycle} />}
             {category === 'other' && <ServiceForm />}
           </div>
         </div>

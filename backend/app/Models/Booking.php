@@ -24,6 +24,7 @@ class Booking extends Model
         'email',
         'phone',
         'hotel_name',
+        'vehicle_option',
         'total_price',
         'status',
     ];

@@ -10,7 +10,10 @@ class TourController extends Controller
 {
     public function index(): JsonResponse
     {
-        $tours = Tour::query()->orderBy('sort_order')->get();
+        $tours = Tour::query()
+            ->where('category', '!=', 'transfer')
+            ->orderBy('sort_order')
+            ->get();
 
         return response()->json([
             'success' => true,
@@ -20,7 +23,10 @@ class TourController extends Controller
 
     public function show(string $slug): JsonResponse
     {
-        $tour = Tour::query()->where('slug', $slug)->firstOrFail();
+        $tour = Tour::query()
+            ->where('slug', $slug)
+            ->where('category', '!=', 'transfer')
+            ->firstOrFail();
 
         return response()->json([
             'success' => true,

@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { CalendarDays, Users } from 'lucide-react';
 import { todayIso } from '@/lib/dates';
 import { API_URL } from '@/lib/api';
+import type { BicycleRental, RentalBike } from '../Transportation';
 import {
   BookingField,
   ContactFields,
@@ -23,6 +24,8 @@ type Form = ContactValues & {
   service_date: string;
   passengers: number;
   pickup_location: string;
+  rental_days: number;
+  rider_heights: string;
 };
 
 const emptyForm: Form = {
@@ -32,10 +35,14 @@ const emptyForm: Form = {
   email: '',
   phone: '',
   pickup_location: '',
+  rental_days: 1,
+  rider_heights: '',
 };
 
-export default function TransportForm() {
-  const [form, setForm] = useState<Form>(emptyForm);
+export default function TransportForm({ rental, bicycle }: { rental: RentalBike | null; bicycle: BicycleRental | null }) {
+  const hasRental = Boolean(rental || bicycle);
+  const [form, setForm] = useState<Form>(() => ({ ...emptyForm, passengers: hasRental ? 1 : 2 }));
+  const [identityDocuments, setIdentityDocuments] = useState<File[]>([]);
   const [status, setStatus] = useState<
     'idle' | 'submitting' | 'done' | 'error'
   >('idle');
@@ -46,14 +53,25 @@ export default function TransportForm() {
     Math.ceil(form.passengers / GUESTS_PER_VEHICLE)
   );
 
-  const total = PRICE_PER_VEHICLE * vehicles;
+  const rentalPrice = rental?.price ?? bicycle?.price;
+  const total = rentalPrice !== undefined
+    ? rentalPrice * form.rental_days * form.passengers
+    : PRICE_PER_VEHICLE * vehicles;
+
+  useEffect(() => {
+    setForm((current) => ({ ...current, passengers: hasRental ? 1 : 2, rental_days: 1, rider_heights: '' }));
+    setIdentityDocuments([]);
+    setStatus('idle');
+    setErrorMsg('');
+  }, [rental?.name, bicycle?.name]);
 
   function setField<K extends keyof Form>(key: K, value: Form[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
   function reset() {
-    setForm(emptyForm);
+    setForm({ ...emptyForm, passengers: hasRental ? 1 : 2 });
+    setIdentityDocuments([]);
     setErrorMsg('');
     setStatus('idle');
   }
@@ -61,30 +79,41 @@ export default function TransportForm() {
   async function submit(e: FormEvent) {
     e.preventDefault();
 
+    if (hasRental && identityDocuments.length !== form.passengers) {
+      setStatus('error');
+      setErrorMsg(`Upload one passport or Cambodian ID card for each of the ${form.passengers} riders.`);
+      return;
+    }
+
     setStatus('submitting');
     setErrorMsg('');
 
     try {
+      const payload = {
+        category: 'transportation',
+        service_name: rental ? `${rental.name} rental` : bicycle ? `${bicycle.brand} ${bicycle.name} bicycle hire` : SERVICE_NAME,
+        service_date: form.service_date,
+        guests: form.passengers,
+        full_name: form.full_name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        pickup_location: form.pickup_location.trim(),
+        message: rental
+          ? `${form.passengers} motorbike${form.passengers > 1 ? 's' : ''} for ${form.rental_days} day${form.rental_days > 1 ? 's' : ''} at ${rental.price}/day; confirm any multi-day discount`
+          : bicycle
+            ? `${form.passengers} bicycle${form.passengers > 1 ? 's' : ''} for ${form.rental_days} day${form.rental_days > 1 ? 's' : ''}; rider height(s): ${form.rider_heights.trim()}`
+            : `${vehicles} vehicle${vehicles > 1 ? 's' : ''}`,
+        total_price: total,
+      };
+      const requestBody = new FormData();
+      Object.entries(payload).forEach(([key, value]) => requestBody.append(key, String(value)));
+      if (hasRental) identityDocuments.forEach((document) => requestBody.append('identity_documents[]', document));
+
       const response = await fetch(`${API_URL}/service-requests`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          category: 'transportation',
-          service_name: SERVICE_NAME,
-          service_date: form.service_date,
-          guests: form.passengers,
-          full_name: form.full_name.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          pickup_location: form.pickup_location.trim(),
-          message: `${vehicles} vehicle${vehicles > 1 ? 's' : ''}`,
-          total_price: total,
-        }),
+        headers: { Accept: 'application/json' },
+        body: requestBody,
       });
-
       const result = await response.json();
 
       if (!response.ok || !result.success) {
@@ -123,14 +152,27 @@ export default function TransportForm() {
   if (status === 'done') {
     return (
       <SuccessCard
-        title="Transfer request received!"
+        title={hasRental ? 'Rental request received!' : 'Transfer request received!'}
         message={
-          <>
-            Thank you, {form.full_name.split(' ')[0] || 'traveler'}. We will
-            confirm your pickup from{' '}
-            <strong>{form.pickup_location.trim() || 'your location'}</strong>{' '}
-            by email at {form.email} shortly.
-          </>
+          rental ? (
+            <>
+              Thank you, {form.full_name.split(' ')[0] || 'traveler'}. We’ll confirm availability and the final price for{' '}
+              <strong>{form.passengers} {rental.name}</strong> for {form.rental_days} day{form.rental_days > 1 ? 's' : ''}, with delivery to{' '}
+              <strong>{form.pickup_location.trim() || 'your hotel'}</strong>, by email at {form.email}.
+            </>
+          ) : bicycle ? (
+            <>
+              Thank you, {form.full_name.split(' ')[0] || 'traveler'}. We’ll confirm availability and the final price for{' '}
+              <strong>{form.passengers} {bicycle.brand} {bicycle.name}</strong> for {form.rental_days} day{form.rental_days > 1 ? 's' : ''}, and check sizing for riders {form.rider_heights}, by email at {form.email}.
+            </>
+          ) : (
+            <>
+              Thank you, {form.full_name.split(' ')[0] || 'traveler'}. We will
+              confirm your pickup from{' '}
+              <strong>{form.pickup_location.trim() || 'your location'}</strong>{' '}
+              by email at {form.email} shortly.
+            </>
+          )
         }
         onReset={reset}
         resetLabel="Make another request"
@@ -145,7 +187,7 @@ export default function TransportForm() {
           label={
             <span className="inline-flex items-center gap-1">
               <CalendarDays className="h-3.5 w-3.5" />
-              Travel date
+              {hasRental ? 'Rental start date' : 'Travel date'}
             </span>
           }
         >
@@ -163,7 +205,7 @@ export default function TransportForm() {
           label={
             <span className="inline-flex items-center gap-1">
               <Users className="h-3.5 w-3.5" />
-              Passengers (max {MAX_PASSENGERS})
+              {rental ? `Motorbikes (max ${MAX_PASSENGERS})` : bicycle ? `Bicycles (max ${MAX_PASSENGERS})` : `Passengers (max ${MAX_PASSENGERS})`}
             </span>
           }
         >
@@ -179,16 +221,69 @@ export default function TransportForm() {
         </BookingField>
       </div>
 
+      {hasRental && (
+        <BookingField label="Rental days (24 hours per day)">
+          <input
+            type="number"
+            required
+            min={1}
+            max={30}
+            value={form.rental_days}
+            onChange={(e) => setField('rental_days', Number(e.target.value))}
+            className={inputClass}
+          />
+          {rental && form.rental_days >= 3 && <p className="mt-1.5 text-xs text-brand-700">The rental shop advertises 10% off or more for 3+ days. We’ll confirm the final discount.</p>}
+        </BookingField>
+      )}
+
+      {bicycle && (
+        <BookingField label="Rider height(s) for bike sizing">
+          <input type="text" required placeholder="For example: 165 cm, 172 cm" value={form.rider_heights} onChange={(e) => setField('rider_heights', e.target.value)} className={inputClass} />
+        </BookingField>
+      )}
+
+      {hasRental && (
+        <BookingField label="Passport or Cambodian ID card (required)">
+          <input
+            type="file"
+            required
+            multiple
+            accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+            onChange={(event) => {
+              const files = Array.from(event.currentTarget.files ?? []);
+              if (files.some((file) => file.size > 10 * 1024 * 1024)) {
+                setIdentityDocuments([]);
+                event.currentTarget.value = '';
+                setStatus('error');
+                setErrorMsg('Each ID or passport file must be 10 MB or smaller.');
+                return;
+              }
+              setIdentityDocuments(files);
+              setStatus('idle');
+              setErrorMsg('');
+            }}
+            className={`${inputClass} file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-brand-800`}
+          />
+          <p className="mt-2 text-xs leading-relaxed text-clay-600">
+            Upload one document per rider: passport for international visitors or Cambodian ID card for Cambodian residents. JPG, PNG, or PDF, up to 10 MB each.
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-clay-500">Documents are attached to your rental request and stored privately; they are not displayed on the public website.</p>
+          {identityDocuments.length > 0 && (
+            <p className="mt-1 text-xs font-medium text-brand-700">{identityDocuments.length} document{identityDocuments.length === 1 ? '' : 's'} selected for {form.passengers} rider{form.passengers === 1 ? '' : 's'}.</p>
+          )}
+        </BookingField>
+      )}
+
       <ContactFields
         values={form}
         onChange={(key, value) => setField(key, value)}
       />
 
-      <BookingField label="Pickup / drop-off location">
+      <BookingField label={rental ? 'Hotel / delivery address' : bicycle ? 'Hotel name & room number' : 'Pickup / drop-off location'}>
         <input
           type="text"
           required
-          placeholder="Tell us your location"
+          placeholder={rental ? 'Enter your hotel name and address' : bicycle ? 'Enter your hotel name and room number' : 'Tell us your location'}
           value={form.pickup_location}
           onChange={(e) => setField('pickup_location', e.target.value)}
           className={inputClass}
@@ -196,7 +291,11 @@ export default function TransportForm() {
       </BookingField>
 
       <TotalBar
-        label={`$${PRICE_PER_VEHICLE} × ${vehicles} vehicle${vehicles > 1 ? 's' : ''} (up to ${GUESTS_PER_VEHICLE} guests each)`}
+        label={rental
+          ? `$${rental.price} × ${form.rental_days} day${form.rental_days > 1 ? 's' : ''} × ${form.passengers} motorbike${form.passengers > 1 ? 's' : ''} (estimate before discount)`
+          : bicycle
+            ? `$${bicycle.price} × ${form.rental_days} day${form.rental_days > 1 ? 's' : ''} × ${form.passengers} bicycle${form.passengers > 1 ? 's' : ''}`
+            : `$${PRICE_PER_VEHICLE} × ${vehicles} vehicle${vehicles > 1 ? 's' : ''} (up to ${GUESTS_PER_VEHICLE} guests each)`}
         amount={total}
       />
 
@@ -204,7 +303,7 @@ export default function TransportForm() {
 
       <SubmitButton
         submitting={status === 'submitting'}
-        label="Request Transfer — Pay Later"
+        label={hasRental ? 'Request Rental — Pay Later' : 'Request Transfer — Pay Later'}
         submittingLabel="Sending request..."
       />
     </form>

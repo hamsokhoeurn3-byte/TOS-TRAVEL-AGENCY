@@ -16,7 +16,7 @@ import {
   Wifi,
   X,
 } from 'lucide-react';
-import { roomTypeGuests, roomTypeName, roomTypePrice, type Hotel } from '../lib/types';
+import { roomTypeGuests, roomTypeName, roomTypePrice, roomTypePriceLabel, type Hotel } from '../lib/types';
 
 type Props = {
   hotel: Hotel;
@@ -36,7 +36,7 @@ export default function StayRoomDetails({ hotel, roomType, onBack, onBook }: Pro
   const khmerMansionPhotoCount = roomType === 'Deluxe Double Room, Poolside' ? 4 : 2;
   const motherhomePhotoCount = roomType === 'Standard Double Room' ? 3 : 2;
   const leNouPhotoCount = 6;
-  const goldenTakeoPhotoCount = roomType === 'Standard Double Room' ? 1 : 2;
+  const goldenTakeoPhotoCount = 2;
   const photos = hotel.slug === 'golden-temple-villa'
     ? Array.from({ length: 5 }, (_, index) => {
         const extension = index === 0 && (roomType === 'Deluxe Double Garden View' || roomType === 'Luxury Double Room') ? 'png' : 'jpg';
@@ -51,7 +51,9 @@ export default function StayRoomDetails({ hotel, roomType, onBack, onBook }: Pro
     : hotel.slug === 'le-nou-siemreap-guesthouse'
       ? Array.from({ length: leNouPhotoCount }, (_, index) => `${roomFolder}/photo-${index + 1}.jpg`)
     : hotel.slug === 'golden-takeo-guesthouse'
-      ? Array.from({ length: goldenTakeoPhotoCount }, (_, index) => `${roomFolder}/photo-${index + 1}.jpg`)
+      ? Array.from({ length: goldenTakeoPhotoCount }, (_, index) => `${roomFolder}/photo-${index + 1}.webp`)
+    : hotel.slug === 'sweet-dreams-guesthouse'
+      ? [`${roomFolder}/photo-1.webp`]
     : hotel.slug === 'amansara'
     ? [
         `${roomFolder}/official-aman.webp`,
@@ -174,7 +176,7 @@ export default function StayRoomDetails({ hotel, roomType, onBack, onBook }: Pro
               <h1 className="mt-1 font-display text-3xl font-bold text-brand-950 sm:text-4xl">{roomType}</h1>
               <p className="mt-1 text-clay-600">at {hotel.name}</p>
             </div>
-            <p className="text-lg font-bold text-brand-900">${price}<span className="ml-1 text-sm font-normal text-clay-500">/night</span></p>
+            <p className="text-lg font-bold text-brand-900">{roomTypePriceLabel(selectedRoom ?? '', hotel.price_from)}<span className="ml-1 text-sm font-normal text-clay-500">/night</span></p>
           </div>
 
           <section className="mt-9">

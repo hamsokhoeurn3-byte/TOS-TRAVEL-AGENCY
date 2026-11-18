@@ -41,35 +41,13 @@ INSERT INTO hotels (slug, name, area, description, price_level, price_from, rati
   14
 ),
 (
-  'prohm-roth-guesthouse',
-  'Prohm Roth Guesthouse',
-  'Wat Bo',
-  'A peaceful guesthouse in the leafy Wat Bo area, across the river from the city centre. Offers comfortable rooms, a small pool, and a relaxed garden setting.',
-  'budget', 20, 4.4, 'Garden Guesthouse',
-  'https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
-  ARRAY['Double Room', 'Twin Room'],
-  'https://www.google.com/maps/search/?api=1&query=Prohm+Roth+Guesthouse+Siem+Reap',
-  15
-),
-(
-  'sam-so-guesthouse',
-  'Sam So Guesthouse',
-  'Svay Dangkum',
-  'A friendly, no-frills guesthouse offering clean rooms and great value near Pub Street and the night market. Popular with backpackers and budget travelers alike.',
-  'budget', 18, 4.2, 'Backpacker Guesthouse',
-  'https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
-  ARRAY['Single Room', 'Double Room', 'Twin Room'],
-  'https://www.google.com/search?q=Sam+So+Guesthouse+Siem+Reap',
-  16
-),
-(
   'sweet-dreams-guesthouse',
   'Sweet Dreams Guesthouse',
-  'Taphul Village',
-  'A cozy, well-kept guesthouse with a pool and restaurant, popular for its comfortable beds and friendly service. A relaxing base close to the Angkor temples and city centre.',
-  'budget', 22, 4.5, 'Cozy Guesthouse',
-  'https://images.pexels.com/photos/1001965/pexels-photo-1001965.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
-  ARRAY['Standard Double', 'Deluxe Double', 'Family Room'],
+  'Wat Bo',
+  'A family-run guesthouse on Wat Bo Street with an outdoor pool, restaurant, and free Wi-Fi. Choose from air-conditioned double, twin, and triple rooms, a short walk from the Royal Residence and central Siem Reap.',
+  'budget', 11, 4.5, 'Cozy Guesthouse',
+  '/hotels/sweet-dreams-guesthouse/hotel/main.webp',
+  ARRAY['Double Air Conditioning', 'Twin Air Conditioning', 'Triple Air Conditioning'],
   'https://www.google.com/maps/search/?api=1&query=Sweet+Dreams+Guesthouse+Siem+Reap',
   17
 ),

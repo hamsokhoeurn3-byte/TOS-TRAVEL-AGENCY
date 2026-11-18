@@ -22,6 +22,7 @@ class ServiceRequest extends Model
         'pickup_location',
         'message',
         'total_price',
+        'identity_document_paths',
     ];
 
     protected function casts(): array
@@ -30,6 +31,7 @@ class ServiceRequest extends Model
             'service_date' => 'date:Y-m-d',
             'guests' => 'integer',
             'total_price' => 'decimal:2',
+            'identity_document_paths' => 'array',
         ];
     }
 }

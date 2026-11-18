@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MapPin, Star, Wifi, Coffee, Car, ExternalLink, ArrowRight, BedDouble, Users, X as CloseIcon, Quote } from 'lucide-react';
-import { roomTypeGuests, roomTypeName, roomTypePrice, type Hotel } from '../lib/types';
+import { roomTypeGuests, roomTypeName, roomTypePriceLabel, type Hotel } from '../lib/types';
 import { Reveal } from './Reveal';
 import StayRoomDetails from './StayRoomDetails';
 
@@ -127,14 +127,6 @@ const hotelReviews: Record<string, HotelReview[]> = {
     { name: 'Jake M.', stay: 'Stayed 3 nights', comment: 'Right by the Old Market — you step out and you are in the middle of everything. The courtyard pool is a lifesaver.' },
     { name: 'Yuki H.', stay: 'Stayed 2 nights', comment: 'Simple, comfortable, and unbeatable location. The staff were very friendly and helpful.' },
   ],
-  'prohm-roth-guesthouse': [
-    { name: 'Elena V.', stay: 'Stayed 4 nights', comment: 'A quiet escape across the river with a lovely garden. Walking distance to great restaurants.' },
-    { name: 'Sean C.', stay: 'Stayed 3 nights', comment: 'Relaxed atmosphere, comfortable room, and the pool was perfect after a hot day at the temples.' },
-  ],
-  'sam-so-guesthouse': [
-    { name: 'Karl J.', stay: 'Stayed 2 nights', comment: 'Great value right near Pub Street. Nothing fancy but everything you need for a short stay.' },
-    { name: 'Mei L.', stay: 'Stayed 3 nights', comment: 'Friendly staff, clean room, and very affordable. The location made exploring so easy.' },
-  ],
   'sweet-dreams-guesthouse': [
     { name: 'Olivia W.', stay: 'Stayed 4 nights', comment: 'The beds really are comfortable! The pool area was lovely and the food at the restaurant was great.' },
     { name: 'Ravi P.', stay: 'Stayed 3 nights', comment: 'Great value with a pool and good breakfast. The staff went above and beyond to help us.' },
@@ -257,7 +249,7 @@ function HotelModal({ hotel, onClose, onBook }: { hotel: Hotel; onClose: () => v
                       </div>
                       <div className="flex items-center gap-4 text-xs text-clay-600">
                         <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {roomGuests(r)} guests</span>
-                        <span className="font-bold text-brand-800">${roomTypePrice(r, hotel.price_from)}<span className="font-normal text-clay-400"> /night</span></span>
+                        <span className="font-bold text-brand-800">{roomTypePriceLabel(r, hotel.price_from)}<span className="font-normal text-clay-400"> /night</span></span>
                       </div>
                     </button>
                   </li>;
