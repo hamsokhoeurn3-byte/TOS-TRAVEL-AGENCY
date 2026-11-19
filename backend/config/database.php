@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -96,7 +96,16 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Supabase requires TLS; 'require' fails closed instead of
+            // silently downgrading to plaintext.
+            'sslmode' => env('DB_SSLMODE', 'require'),
+            // Server-side prepared statements are incompatible with
+            // transaction-mode poolers (used by serverless hosts). Set
+            // DB_EMULATE_PREPARES=true only for that connection method;
+            // session poolers and direct connections support prepares.
+            'options' => filter_var(env('DB_EMULATE_PREPARES', false), FILTER_VALIDATE_BOOL)
+                ? [PDO::ATTR_EMULATE_PREPARES => true]
+                : [],
         ],
 
         'sqlsrv' => [
