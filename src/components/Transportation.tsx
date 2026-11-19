@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { ArrowRight, Bike, Bus, Car, Check, Clock3, Plane, ShieldCheck, X } from 'lucide-react';
+import { ArrowRight, Bike, Bus, Car, Check, ShieldCheck, X } from 'lucide-react';
 import { Reveal } from './Reveal';
+import IntercityBusBooking from './IntercityBusBooking';
 
 type TransportationFilter =
   | 'all'
   | 'tuk-tuk'
   | 'private-car'
   | 'minivan'
-  | 'airport-transfer'
   | 'bicycle'
-  | 'motorcycle'
-  | 'group';
+  | 'motorcycle';
 
 type TransportationService = {
   category: Exclude<TransportationFilter, 'all'>;
@@ -33,6 +32,8 @@ export type TukTukService = {
   image: string;
   backupImage: string;
 };
+
+export type PrivateCarService = Pick<TukTukService, 'title' | 'description' | 'stops' | 'price' | 'image' | 'backupImage'> & { startingPrice?: number | null };
 
 const tukTukServices: TukTukService[] = [
   {
@@ -91,7 +92,68 @@ const tukTukServices: TukTukService[] = [
   },
 ];
 
-function TukTukServiceImage({ service }: { service: TukTukService }) {
+const privateCarServices: PrivateCarService[] = [
+  {
+    title: 'Private Airport Pickup',
+    description: 'Your driver meets you at Siem Reap Angkor International Airport and takes you directly to your hotel.',
+    stops: 'Airport arrival pickup · Flight tracking · Hotel drop-off',
+    price: 'From $35 per car',
+    startingPrice: 35,
+    image: 'https://cdn.getyourguide.com/image/format%3Dauto%2Cfit%3Dcrop%2Cgravity%3Dauto%2Cquality%3D60%2Cwidth%3D450%2Cheight%3D450%2Cdpr%3D2/tour_img/a3e3fa203afbf2d2.jpeg',
+    backupImage: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  },
+  {
+    title: 'Private Airport Drop-off',
+    description: 'A private ride from your hotel to Siem Reap Angkor International Airport for your departing flight.',
+    stops: 'Hotel pickup · Flight details · Airport drop-off',
+    price: 'From $35 per car',
+    startingPrice: 35,
+    image: 'https://cdn.getyourguide.com/image/format%3Dauto%2Cfit%3Dcrop%2Cgravity%3Dauto%2Cquality%3D60%2Cwidth%3D450%2Cheight%3D450%2Cdpr%3D2/tour_img/a3e3fa203afbf2d2.jpeg',
+    backupImage: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  },
+  {
+    title: 'City Transfers',
+    description: 'Door-to-door private rides around Siem Reap for dining, shopping, and local visits.',
+    stops: 'Hotel pickup · Flexible drop-off · Private vehicle',
+    price: 'Request a quote',
+    image: 'https://thumb.tidesquare.com/tour/public/product/PRV3006455682/PRD3013112861/origin/4-145.jpg?type=wide',
+    backupImage: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  },
+  {
+    title: 'Angkor Temple Transportation',
+    description: 'Private vehicle and driver for a flexible day visiting the Angkor temple area.',
+    stops: 'Hotel pickup · Angkor Wat · Angkor Thom · Ta Prohm · Custom route',
+    price: 'From $50 per vehicle',
+    image: 'https://www.siemreapshuttle.com/wp-content/uploads/2025/08/private-driver-angkor.jpg',
+    backupImage: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/2e/d8/01/cambodia-angkor-wat-taxi.jpg?h=1200&s=1&w=1200',
+  },
+  {
+    title: 'Family & Group Car',
+    description: 'Choose a larger SUV or minivan for families and groups travelling together.',
+    stops: 'SUVs · Minivans · Group pickup · Luggage space',
+    price: 'From $45 per vehicle',
+    image: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/f8/cf/84/toyota-hiace-taxi.jpg?h=1200&s=1&w=1200',
+    backupImage: 'https://www.phoadventure.com/uploads/0000/7/2026/04/30/copilot-20260430-133215.png',
+  },
+  {
+    title: 'Intercity Transfers',
+    description: 'Private long-distance transfers from Siem Reap to destinations across Cambodia.',
+    stops: 'Battambang · Phnom Penh · Kampot · Custom destinations',
+    price: 'From $65 per vehicle',
+    image: 'https://vietnambudgetcarrental.com/vnt_upload/carrental/12_2023/private-car-phnom-penh-to-ho-chi-minh_1.jpg',
+    backupImage: 'https://thumb.tidesquare.com/tour/public/product/PRV3006455682/PRD3013112861/origin/10-145.jpg?type=wide',
+  },
+  {
+    title: 'Private Car with Driver',
+    description: 'Keep a private driver for a half-day or full-day itinerary with planned stops.',
+    stops: '4-hour hire · 8-hour hire · Additional stops by arrangement',
+    price: 'Request a quote',
+    image: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    backupImage: 'https://thumb.tidesquare.com/tour/public/product/PRV3006455682/PRD3013112861/origin/4-145.jpg?type=wide',
+  },
+];
+
+function TukTukServiceImage({ service }: { service: Pick<TukTukService, 'title' | 'image' | 'backupImage'> }) {
   const [source, setSource] = useState(service.image);
   const [usingBackup, setUsingBackup] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -214,11 +276,9 @@ const filterLabels: Record<TransportationFilter, string> = {
   all: 'All Transportation',
   'tuk-tuk': 'Tuk-Tuk',
   'private-car': 'Private Car',
-  minivan: 'Minivan',
-  'airport-transfer': 'Airport Transfer',
+  minivan: 'Bus & Minivan Transfers',
   bicycle: 'Bicycle Rental',
   motorcycle: 'Motorcycle & Scooter Rental',
-  group: 'Group Transportation',
 };
 
 const services: TransportationService[] = [
@@ -250,15 +310,6 @@ const services: TransportationService[] = [
     accent: 'bg-clay-100 text-clay-800',
   },
   {
-    category: 'airport-transfer',
-    label: 'Arrive with ease',
-    title: 'Airport Transfer',
-    description: 'Meet your driver at Siem Reap Angkor International Airport and go directly to your hotel.',
-    details: 'Flight tracking included',
-    icon: Plane,
-    accent: 'bg-brand-50 text-brand-700',
-  },
-  {
     category: 'bicycle',
     label: 'Slow travel',
     title: 'Bicycle Rental',
@@ -276,24 +327,62 @@ const services: TransportationService[] = [
     icon: Bike,
     accent: 'bg-clay-100 text-clay-800',
   },
-  {
-    category: 'group',
-    label: 'Travel together',
-    title: 'Group Transportation',
-    description: 'Coordinated vehicles for groups, with pickup and drop-off options for your event or itinerary.',
-    details: 'Pickup & drop-off available',
-    icon: Bus,
-    accent: 'bg-brand-50 text-brand-700',
-  },
 ];
 
 type Props = {
   onBookRental: (rental: RentalBike) => void;
   onBookBicycle: (bicycle: BicycleRental) => void;
   onBookTukTuk: (service: TukTukService) => void;
+  onRequestPrivateCar: (service: PrivateCarService) => void;
 };
 
-export default function Transportation({ onBookRental, onBookBicycle, onBookTukTuk }: Props) {
+function AllTransportationCatalog({ onBookRental, onBookBicycle, onBookTukTuk, onRequestPrivateCar }: Props) {
+  return (
+    <div className="mt-12 space-y-14">
+      <div>
+        <h3 className="mb-5 font-display text-2xl font-bold text-brand-950">Tuk-Tuk services</h3>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{tukTukServices.map((service) => (
+          <article key={service.id} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-clay-100 bg-white transition hover:-translate-y-1 hover:border-brand-200 hover:shadow-xl">
+            <div className="h-52 overflow-hidden bg-clay-100"><TukTukServiceImage service={service} /></div>
+            <div className="flex flex-1 flex-col p-5"><span className="text-xs font-semibold uppercase tracking-wide text-gold-600">Tuk-Tuk service</span><h4 className="mt-2 font-display text-xl font-bold text-brand-900">{service.title}</h4><p className="mt-2 text-sm leading-relaxed text-clay-600">{service.description}</p><p className="mt-3 flex-1 text-sm leading-relaxed text-clay-700"><strong>Options:</strong> {service.stops}</p><div className="mt-4 flex justify-between border-t border-clay-100 pt-4 text-sm"><strong className="text-brand-800">Pickup & drop-off</strong><strong className="text-gold-600">{service.price}</strong></div><button type="button" onClick={() => onBookTukTuk(service)} className="mt-4 w-full rounded-xl bg-gold-500 px-4 py-2.5 font-semibold text-brand-950 hover:bg-gold-400">Request this Tuk-Tuk <ArrowRight className="ml-1 inline h-4 w-4" /></button></div>
+          </article>
+        ))}</div>
+      </div>
+
+      <div>
+        <h3 className="mb-5 font-display text-2xl font-bold text-brand-950">Private car services</h3>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{privateCarServices.map((service) => (
+          <article key={service.title} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-clay-100 bg-white transition hover:-translate-y-1 hover:border-brand-200 hover:shadow-xl">
+            <div className="h-52 overflow-hidden bg-clay-100"><TukTukServiceImage service={service} /></div>
+            <div className="flex flex-1 flex-col p-5"><span className="text-xs font-semibold uppercase tracking-wide text-gold-600">Private car service</span><h4 className="mt-2 font-display text-xl font-bold text-brand-900">{service.title}</h4><p className="mt-2 text-sm leading-relaxed text-clay-600">{service.description}</p><p className="mt-3 flex-1 text-sm leading-relaxed text-clay-700"><strong>Options:</strong> {service.stops}</p><div className="mt-4 flex justify-between border-t border-clay-100 pt-4 text-sm"><strong className="text-brand-800">Pickup & drop-off</strong><strong className="text-gold-600">{service.price}</strong></div><button type="button" onClick={() => onRequestPrivateCar(service)} className="mt-4 w-full rounded-xl bg-gold-500 px-4 py-2.5 font-semibold text-brand-950 hover:bg-gold-400">Request this car <ArrowRight className="ml-1 inline h-4 w-4" /></button></div>
+          </article>
+        ))}</div>
+      </div>
+
+      <div>
+        <h3 className="font-display text-2xl font-bold text-brand-950">Bus & minivan transfers</h3>
+        <p className="mt-1 text-sm text-clay-600">Search routes, dates, reference fares, and vehicle options.</p>
+        <IntercityBusBooking />
+      </div>
+
+      <div>
+        <h3 className="mb-5 font-display text-2xl font-bold text-brand-950">Bicycle rentals</h3>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{bicycleRentals.map((bicycle) => (
+          <article key={`${bicycle.brand}-${bicycle.name}`} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-clay-100 bg-white transition hover:-translate-y-1 hover:border-brand-200 hover:shadow-xl"><div className="h-52 overflow-hidden bg-clay-100"><BicycleImage bicycle={bicycle} /></div><div className="flex flex-1 flex-col p-5"><span className="text-xs font-semibold uppercase tracking-wide text-gold-600">Bicycle rental · {bicycle.brand}</span><h4 className="mt-2 font-display text-xl font-bold text-brand-900">{bicycle.name}</h4><p className="mt-2 flex-1 text-sm text-clay-600">{bicycle.included}</p><div className="mt-4 flex items-center justify-between border-t border-clay-100 pt-4"><strong className="text-brand-800">${bicycle.price} / day</strong><button type="button" onClick={() => onBookBicycle(bicycle)} className="font-semibold text-gold-600">Request <ArrowRight className="ml-1 inline h-4 w-4" /></button></div></div></article>
+        ))}</div>
+      </div>
+
+      <div>
+        <h3 className="mb-5 font-display text-2xl font-bold text-brand-950">Motorcycle & scooter rentals</h3>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{rentalBikes.map((bike) => (
+          <article key={bike.name} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-clay-100 bg-white transition hover:-translate-y-1 hover:border-brand-200 hover:shadow-xl"><div className="h-52 overflow-hidden bg-clay-100"><RentalBikeImage bike={bike} /></div><div className="flex flex-1 flex-col p-5"><span className="text-xs font-semibold uppercase tracking-wide text-gold-600">Motorcycle & scooter rental</span><h4 className="mt-2 font-display text-xl font-bold text-brand-900">{bike.name}</h4><p className="mt-2 flex-1 text-sm text-clay-600">{bike.transmission} · Helmet and phone holder included</p><div className="mt-4 flex items-center justify-between border-t border-clay-100 pt-4"><strong className="text-brand-800">${bike.price} / day</strong><button type="button" onClick={() => onBookRental(bike)} className="font-semibold text-gold-600">Request <ArrowRight className="ml-1 inline h-4 w-4" /></button></div></div></article>
+        ))}</div>
+      </div>
+    </div>
+  );
+}
+
+export default function Transportation({ onBookRental, onBookBicycle, onBookTukTuk, onRequestPrivateCar }: Props) {
   const [filter, setFilter] = useState<TransportationFilter>('all');
   const [detailBike, setDetailBike] = useState<RentalBike | null>(null);
   const [detailBicycle, setDetailBicycle] = useState<BicycleRental | null>(null);
@@ -330,7 +419,9 @@ export default function Transportation({ onBookRental, onBookBicycle, onBookTukT
           ))}
         </Reveal>
 
-        {filter === 'motorcycle' ? (
+        {filter === 'all' ? (
+          <AllTransportationCatalog onBookRental={onBookRental} onBookBicycle={onBookBicycle} onBookTukTuk={onBookTukTuk} onRequestPrivateCar={onRequestPrivateCar} />
+        ) : filter === 'motorcycle' ? (
           <>
             <p className="mt-10 text-center text-sm text-clay-600">
               Daily rates are for 24 hours. Rentals of 3 days or more receive 10% off or more. Every rental includes helmets, a phone holder, and free hotel delivery.
@@ -360,6 +451,43 @@ export default function Transportation({ onBookRental, onBookBicycle, onBookTukT
             <p className="mt-5 text-center text-xs text-clay-500">
               Rates and rental terms are from WE Scooter Rental Siem Reap. Confirm availability and current offers with the rental shop.
             </p>
+          </>
+        ) : filter === 'minivan' ? (
+          <>
+            <p className="mt-10 text-center text-sm text-clay-600">
+              Search intercity routes, select a bus or minivan, and send TOS a booking request for confirmation.
+            </p>
+            <IntercityBusBooking />
+          </>
+        ) : filter === 'private-car' ? (
+          <>
+            <p className="mt-10 text-center text-sm text-clay-600">
+              Choose a private car service and send us your trip details. We’ll confirm the vehicle and final fare before your ride.
+            </p>
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {privateCarServices.map((service, index) => (
+                <Reveal key={service.title} delay={(index % 3) * 80}>
+                  <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-clay-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-xl">
+                    <div className="h-52 overflow-hidden bg-clay-100">
+                      <TukTukServiceImage service={service} />
+                    </div>
+                    <div className="flex flex-1 flex-col p-5">
+                      <span className="text-xs font-semibold uppercase tracking-wide text-gold-600">Private car service</span>
+                      <h3 className="mt-2 font-display text-xl font-bold text-brand-900">{service.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-clay-600">{service.description}</p>
+                      <p className="mt-3 flex-1 text-sm leading-relaxed text-clay-700"><span className="font-semibold">Options:</span> {service.stops}</p>
+                      <div className="mt-5 flex items-center justify-between border-t border-clay-100 pt-4">
+                        <span className="text-sm font-semibold text-brand-800">Pickup & drop-off available</span>
+                        <span className="text-right text-sm font-semibold text-gold-600">{service.price}</span>
+                      </div>
+                      <button type="button" onClick={() => onRequestPrivateCar(service)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gold-500 px-4 py-2.5 font-semibold text-brand-950 transition hover:bg-gold-400">
+                        Request this car <ArrowRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
           </>
         ) : filter === 'tuk-tuk' ? (
           <>
@@ -437,7 +565,7 @@ export default function Transportation({ onBookRental, onBookBicycle, onBookTukT
                   <p className="mt-2 flex-1 text-sm leading-relaxed text-clay-600">{service.description}</p>
                   <div className="mt-5 flex items-center justify-between border-t border-clay-200 pt-4">
                     <span className="flex items-center gap-1.5 text-xs font-medium text-clay-500">
-                      {service.category === 'airport-transfer' ? <Clock3 className="h-3.5 w-3.5" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+                      <ShieldCheck className="h-3.5 w-3.5" />
                       {service.details}
                     </span>
                     <a href="#contact" className="flex items-center gap-1 text-sm font-semibold text-gold-400 transition-all group-hover:gap-2">

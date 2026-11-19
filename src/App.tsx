@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Tours from './components/Tours';
-import Transportation, { type BicycleRental, type RentalBike, type TukTukService } from './components/Transportation';
+import Transportation, { type BicycleRental, type PrivateCarService, type RentalBike, type TukTukService } from './components/Transportation';
 import AboutUs from './components/AboutUs';
 import WhyUs from './components/WhyUs';
 import Reviews from './components/Reviews';
@@ -25,6 +25,7 @@ export default function App() {
   const [selectedRental, setSelectedRental] = useState<RentalBike | null>(null);
   const [selectedBicycle, setSelectedBicycle] = useState<BicycleRental | null>(null);
   const [selectedTukTuk, setSelectedTukTuk] = useState<TukTukService | null>(null);
+  const [selectedPrivateCar, setSelectedPrivateCar] = useState<PrivateCarService | null>(null);
   const [bookingCategory, setBookingCategory] = useState<BookingCategory>('tours');
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
@@ -90,6 +91,7 @@ export default function App() {
     setSelectedRental(rental);
     setSelectedBicycle(null);
     setSelectedTukTuk(null);
+    setSelectedPrivateCar(null);
     setBookingCategory('transportation');
     scrollToBooking();
   }
@@ -98,14 +100,25 @@ export default function App() {
     setSelectedBicycle(bicycle);
     setSelectedRental(null);
     setSelectedTukTuk(null);
+    setSelectedPrivateCar(null);
     setBookingCategory('transportation');
     scrollToBooking();
   }
 
   function bookTukTuk(service: TukTukService) {
     setSelectedTukTuk(service);
+    setSelectedPrivateCar(null);
     setSelectedRental(null);
     setSelectedBicycle(null);
+    setBookingCategory('transportation');
+    scrollToBooking();
+  }
+
+  function requestPrivateCar(service: PrivateCarService) {
+    setSelectedRental(null);
+    setSelectedBicycle(null);
+    setSelectedTukTuk(null);
+    setSelectedPrivateCar(service);
     setBookingCategory('transportation');
     scrollToBooking();
   }
@@ -136,8 +149,8 @@ export default function App() {
           <>
             <Stay hotels={hotels} onStay={bookStay} />
             <Tours tours={activityTours} onBook={bookTour} />
-            <Transportation onBookRental={bookRental} onBookBicycle={bookBicycle} onBookTukTuk={bookTukTuk} />
-            <TripPlanner tours={activityTours} />
+            <Transportation onBookRental={bookRental} onBookBicycle={bookBicycle} onBookTukTuk={bookTukTuk} onRequestPrivateCar={requestPrivateCar} />
+            <TripPlanner tours={activityTours} hotels={hotels} />
             <Reviews />
             <Faq />
             <AboutUs />
@@ -156,6 +169,7 @@ export default function App() {
               selectedRental={selectedRental}
               selectedBicycle={selectedBicycle}
               selectedTukTuk={selectedTukTuk}
+              selectedPrivateCar={selectedPrivateCar}
             />
 
           </>

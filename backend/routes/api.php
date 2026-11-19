@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ServiceRequestController;
 use App\Http\Controllers\Api\StayBookingController;
 use App\Http\Controllers\Api\TourController;
 use App\Http\Controllers\Api\TripPlanController;
+use App\Http\Controllers\Api\TripPlannerChatController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/tours', [TourController::class, 'index']);
@@ -24,3 +25,4 @@ Route::post('/service-requests', [ServiceRequestController::class, 'store']);
 
 // Trip plans
 Route::post('/trip-plans', [TripPlanController::class, 'store']);
+Route::post('/trip-planner/chat', TripPlannerChatController::class)->middleware('throttle:20,1');

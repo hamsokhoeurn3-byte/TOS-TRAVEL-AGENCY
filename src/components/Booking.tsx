@@ -6,7 +6,7 @@ import AccommodationForm from './booking/AccommodationForm';
 import TourForm from './booking/TourForm';
 import TransportForm from './booking/TransportForm';
 import ServiceForm from './booking/ServiceForm';
-import type { BicycleRental, RentalBike } from './Transportation';
+import type { BicycleRental, PrivateCarService, RentalBike, TukTukService } from './Transportation';
 
 export type BookingCategory = 'accommodation' | 'tours' | 'transportation' | 'other';
 
@@ -107,6 +107,8 @@ type Props = {
   onChangeHotel: (hotel: Hotel | null) => void;
   selectedRental: RentalBike | null;
   selectedBicycle: BicycleRental | null;
+  selectedTukTuk: TukTukService | null;
+  selectedPrivateCar: PrivateCarService | null;
 };
 
 export default function Booking({
@@ -121,24 +123,42 @@ export default function Booking({
   onChangeHotel,
   selectedRental,
   selectedBicycle,
+  selectedTukTuk,
+  selectedPrivateCar,
 }: Props) {
   const active = categories.find((c) => c.key === category) ?? categories[0];
-  const panelTitle = category === 'transportation' && selectedRental
+  const panelTitle = category === 'transportation' && selectedTukTuk
+    ? `Request ${selectedTukTuk.title}`
+    : category === 'transportation' && selectedPrivateCar
+      ? `Request ${selectedPrivateCar.title}`
+    : category === 'transportation' && selectedRental
     ? 'Request a Motor Rental'
     : category === 'transportation' && selectedBicycle
       ? 'Request a Bicycle Rental'
       : active.panelTitle;
-  const panelText = category === 'transportation' && selectedRental
+  const panelText = category === 'transportation' && selectedTukTuk
+    ? `Request a ${selectedTukTuk.title.toLowerCase()} from ${selectedTukTuk.price}. We’ll confirm availability and the final fare with you.`
+    : category === 'transportation' && selectedPrivateCar
+      ? `${selectedPrivateCar.description} ${selectedPrivateCar.price}. We’ll confirm your pickup and final fare.`
+    : category === 'transportation' && selectedRental
     ? `Request ${selectedRental.name} for $${selectedRental.price} per 24-hour day. We’ll confirm availability and the final rental terms with you.`
     : category === 'transportation' && selectedBicycle
       ? `Request ${selectedBicycle.brand} ${selectedBicycle.name} for $${selectedBicycle.price} per day. We’ll confirm availability and bike sizing with you.`
       : active.panelText;
-  const panelImage = category === 'transportation' && selectedRental
+  const panelImage = category === 'transportation' && selectedTukTuk
+    ? selectedTukTuk.image
+    : category === 'transportation' && selectedPrivateCar
+      ? selectedPrivateCar.image
+    : category === 'transportation' && selectedRental
     ? selectedRental.image
     : category === 'transportation' && selectedBicycle
       ? selectedBicycle.image
       : active.image;
-  const panelImageBackup = category === 'transportation' && selectedRental
+  const panelImageBackup = category === 'transportation' && selectedTukTuk
+    ? selectedTukTuk.backupImage
+    : category === 'transportation' && selectedPrivateCar
+      ? selectedPrivateCar.backupImage
+    : category === 'transportation' && selectedRental
     ? selectedRental.backupImage
     : category === 'transportation' && selectedBicycle
       ? selectedBicycle.backupImage
@@ -213,7 +233,7 @@ export default function Booking({
             {category === 'tours' && (
               <TourForm tours={tours} selectedTour={selectedTour} onChangeTour={onChangeTour} />
             )}
-            {category === 'transportation' && <TransportForm rental={selectedRental} bicycle={selectedBicycle} />}
+            {category === 'transportation' && <TransportForm rental={selectedRental} bicycle={selectedBicycle} tukTuk={selectedTukTuk} privateCar={selectedPrivateCar} />}
             {category === 'other' && <ServiceForm />}
           </div>
         </div>

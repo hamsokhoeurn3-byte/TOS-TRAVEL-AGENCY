@@ -18,6 +18,26 @@ const levelStyles: Record<Hotel['price_level'], string> = {
   luxury: 'bg-clay-100 text-clay-800',
 };
 
+const bookingListingUrls: Record<string, string> = {
+  'golden-temple-residence': 'https://www.booking.com/hotel/kh/golden-temple-residence.cs.html',
+  'viroths-hotel': 'https://www.booking.com/hotel/kh/viroth-hotel-new-wing.html',
+  'jaya-house-river-park': 'https://www.booking.com/hotel/kh/jaya-house-river-park-siem-reap.en-gb.html',
+  'golden-temple-retreat': 'https://www.booking.com/hotel/kh/golden-temple-retreat.es.html',
+  'golden-temple-villa': 'https://www.booking.com/hotel/kh/golden-temple-villa-siem-reap1.es.html',
+  'eightfold-urban-resort': 'https://www.booking.com/hotel/kh/eightfold-urban-resort.en-gb.html',
+  'shintamani-angkor': 'https://www.booking.com/hotel/kh/shinta-mani.es.html',
+  'khmer-mansion-boutique': 'https://www.booking.com/hotel/kh/khmer-mansion.html',
+  'park-hyatt-siem-reap': 'https://www.booking.com/hotel/kh/park-hyatt-siem-reap.nl.html',
+  'raffles-grand-hotel-angkor': 'https://www.booking.com/hotel/kh/raffles-grand-d-angkor.html',
+  'le-nou-siemreap-guesthouse': 'https://www.booking.com/hotel/kh/your-guesthouse.en-gb.html',
+  'bokre-angkor-hostel': 'https://www.booking.com/hotel/kh/yellow-guest-house.en-gb.html',
+  'siem-reap-pub-hostel': 'https://www.booking.com/hotel/kh/siem-reap-pub-hostel.en-gb.html',
+};
+
+function bookingListingUrl(hotelSlug: string): string {
+  return bookingListingUrls[hotelSlug] ?? 'https://www.booking.com/?auth_success=1';
+}
+
 const roomGuestMap: Record<string, number> = {
   'Deluxe Room': 2,
   'Deluxe Suite': 2,
@@ -411,18 +431,16 @@ export default function Stay({
                       <span className="text-[10px] text-clay-500">/ night</span>
                     </p>
                     <div className="flex min-w-0 items-center gap-2">
-                      {h.website_url && (
-                        <a
-                          href={h.website_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(event) => event.stopPropagation()}
-                          aria-label={`Visit ${h.name} website`}
-                          className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[11px] font-bold text-[#003B95] transition-colors hover:text-[#002b70]"
-                        >
-                          <ExternalLink className="h-3 w-3" /> {h.slug === 'golden-temple-residence' ? 'Booking.com' : 'Website'}
-                        </a>
-                      )}
+                      <a
+                        href={bookingListingUrl(h.slug)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(event) => event.stopPropagation()}
+                        aria-label={`Find ${h.name} on Booking.com`}
+                        className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[11px] font-bold text-[#003B95] transition-colors hover:text-[#002b70]"
+                      >
+                        <ExternalLink className="h-3 w-3" /> Booking.com
+                      </a>
                       <span className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap text-[11px] font-bold text-gold-700">
                         View Details <ArrowRight className="h-3.5 w-3.5" />
                       </span>

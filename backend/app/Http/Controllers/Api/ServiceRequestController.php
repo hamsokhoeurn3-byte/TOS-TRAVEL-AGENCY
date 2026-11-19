@@ -63,8 +63,9 @@ class ServiceRequestController extends Controller
         $identityDocumentPaths = [];
         foreach ($identityDocuments as $document) {
             $path = $document->store('rental-identification', 'local');
-            if (!$path) {
+            if (! $path) {
                 Storage::disk('local')->delete($identityDocumentPaths);
+
                 return response()->json([
                     'success' => false,
                     'message' => 'We could not securely save the ID documents. Please try again.',
@@ -77,6 +78,7 @@ class ServiceRequestController extends Controller
             'id' => (string) Str::uuid(),
             ...$validated,
             'identity_document_paths' => $identityDocumentPaths ?: null,
+            'status' => 'pending',
         ]);
 
         return response()->json([
@@ -84,6 +86,7 @@ class ServiceRequestController extends Controller
             'message' => 'Service request received successfully.',
             'data' => [
                 'id' => $serviceRequest->id,
+                'status' => $serviceRequest->status,
             ],
         ], 201);
     }

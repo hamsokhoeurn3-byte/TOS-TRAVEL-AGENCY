@@ -22,6 +22,7 @@ class ServiceRequest extends Model
         'pickup_location',
         'message',
         'total_price',
+        'status',
         'identity_document_paths',
     ];
 
