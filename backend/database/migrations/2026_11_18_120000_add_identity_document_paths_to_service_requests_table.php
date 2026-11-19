@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('service_requests', function (Blueprint $table) {
-            $table->json('identity_document_paths')->nullable()->after('total_price');
+            $table->json('identity_document_paths')->nullable();
         });
     }
 
