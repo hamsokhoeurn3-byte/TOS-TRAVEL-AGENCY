@@ -21,9 +21,9 @@ const quickLinks = [
 ];
 
 const socialLinks = [
-  { label: 'Facebook', href: 'https://www.facebook.com/share/1DeciWiR8t/', className: 'bg-[#0866ff]' },
-  { label: 'TikTok', href: 'https://www.tiktok.com/@kinji123456?is_from_webapp=1&sender_device=pc', className: 'bg-black' },
-  { label: 'Instagram', href: 'https://www.instagram.com/sokhoeurnham/', className: 'bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045]' },
+  { label: 'Facebook', href: 'https://www.facebook.com/share/18kgwHphWu/', className: 'bg-[#0866ff]' },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@tostravelagency?_r=1&_t=ZS-9BTEH7Zvf6X', className: 'bg-black' },
+  { label: 'Instagram', href: 'https://www.instagram.com/tostravelagency_99?exln=MWsydHp2b2ZqamliNw==', className: 'bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045]' },
 ];
 
 function SocialIcon({ name }: { name: string }) {
