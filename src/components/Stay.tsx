@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, Star, Wifi, Coffee, Car, ExternalLink, ArrowRight, BedDouble, Users, X as CloseIcon, Quote } from 'lucide-react';
+import { MapPin, Star, Wifi, Coffee, Car, ExternalLink, ArrowRight, BedDouble, Users, X as CloseIcon, Quote, Search } from 'lucide-react';
 import { roomTypeGuests, roomTypeName, roomTypePriceLabel, type Hotel } from '../lib/types';
 import { Reveal } from './Reveal';
 import StayRoomDetails from './StayRoomDetails';
@@ -351,6 +351,8 @@ export default function Stay({
 }) {
   const [filter, setFilter] = useState<'all' | Hotel['price_level']>('all');
   const [selected, setSelected] = useState<Hotel | null>(null);
+  const [searchInput, setSearchInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const filters: Array<{ key: 'all' | Hotel['price_level']; label: string }> = [
     { key: 'all', label: 'All Stays' },
@@ -360,7 +362,13 @@ export default function Stay({
   ];
 
   const topRated = hotels.filter((h) => Number(h.rating) >= TOP_RATING);
-  const visible = filter === 'all' ? topRated : topRated.filter((h) => h.price_level === filter);
+  const visible = topRated.filter((hotel) => {
+    const matchesPrice = filter === 'all' || hotel.price_level === filter;
+    const term = searchTerm.trim().toLowerCase();
+    const matchesSearch = !term || [hotel.name, hotel.area, hotel.description, hotel.style]
+      .some((value) => value.toLowerCase().includes(term));
+    return matchesPrice && matchesSearch;
+  });
 
   return (
     <section id="stay" className="bg-white py-24">
@@ -376,20 +384,39 @@ export default function Stay({
           </p>
         </Reveal>
 
-        <Reveal delay={100} className="mt-10 flex flex-wrap justify-center gap-2">
-          {filters.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              className={`rounded-full px-5 py-2 text-sm font-semibold transition-all ${
-                filter === f.key
-                  ? 'bg-brand-700 text-white shadow-md'
-                  : 'bg-clay-50 text-clay-700 hover:bg-brand-50'
-              }`}
+        <Reveal delay={100}>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              setSearchTerm(searchInput);
+            }}
+            className="mx-auto mt-8 flex max-w-3xl flex-col gap-2 sm:flex-row"
+            role="search"
+          >
+            <input
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Search by hotel name or area"
+              aria-label="Search hotels by name or area"
+              className="min-w-0 flex-1 rounded-full border border-clay-200 bg-white px-5 py-3 text-sm text-brand-900 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+            />
+            <select
+              value={filter}
+              onChange={(event) => setFilter(event.target.value as typeof filter)}
+              aria-label="Filter hotels by price range"
+              className="rounded-full border border-clay-200 bg-white px-5 py-3 text-sm font-medium text-brand-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
             >
-              {f.label}
+              {filters.map((option) => (
+                <option key={option.key} value={option.key}>{option.label}</option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-600"
+            >
+              <Search className="h-4 w-4" /> Search
             </button>
-          ))}
+          </form>
         </Reveal>
 
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -451,6 +478,11 @@ export default function Stay({
             </Reveal>
           ))}
         </div>
+        {visible.length === 0 && (
+          <p className="mt-10 text-center text-sm text-clay-600">
+            No hotels match your search. Try another name or area.
+          </p>
+        )}
 
       </div>
 

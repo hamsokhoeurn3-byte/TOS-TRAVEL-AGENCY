@@ -88,7 +88,7 @@ export default function Header() {
           <a
             href="#top"
             onClick={(event) => scrollToSection(event, '#top')}
-            className="flex items-center gap-3 py-1.5 pr-2"
+            className="flex items-center gap-3 py-1.5 pr-2 lg:-translate-x-24"
           >
             <img
               src="/TOS_Travel_Agency_Logo.png?v=3"

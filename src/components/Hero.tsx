@@ -1,7 +1,15 @@
+import { useEffect, useState } from 'react';
 import { MapPin, Search, Star, ShieldCheck, Users } from 'lucide-react';
 import { Reveal } from './Reveal';
 
 export default function Hero() {
+  const [showVideo, setShowVideo] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShowVideo(true), 5000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   return (
     <section id="top" className="relative flex min-h-[92vh] items-center justify-center overflow-hidden">
       <img
@@ -9,6 +17,22 @@ export default function Hero() {
         alt="Sunrise over Angkor Wat"
         className="absolute inset-0 h-full w-full object-cover"
       />
+      {showVideo && (
+        <video
+          key="hero-video"
+          className="absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          poster="https://images.pexels.com/photos/3217663/pexels-photo-3217663.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          onEnded={() => setShowVideo(false)}
+          onError={() => setShowVideo(false)}
+          aria-hidden="true"
+        >
+          <source src="/bg.mp4" type="video/mp4" />
+        </video>
+      )}
       <div className="absolute inset-0 bg-gradient-to-b from-brand-950/70 via-brand-950/40 to-brand-950/80" />
 
       <div className="relative mx-auto max-w-4xl px-4 py-32 text-center">
@@ -20,13 +44,14 @@ export default function Hero() {
         </Reveal>
         <Reveal delay={100}>
           <h1 className="font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-            Unforgettable Siem Reap Tours in Small Shared Groups
+            {showVideo ? 'Discover the Wonders of Angkor' : 'Unforgettable Siem Reap Tours in Small Shared Groups'}
           </h1>
         </Reveal>
         <Reveal delay={200}>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/85">
-            Start your Cambodian adventure today with the safest and most reliable tour company
-            in Siem Reap — max 10 guests per group, expert local guides.
+            {showVideo
+              ? 'Explore ancient temples, lush landscapes, and local culture with expert guides in small groups of up to 10.'
+              : 'Start your Cambodian adventure today with the safest and most reliable tour company in Siem Reap — max 10 guests per group, expert local guides.'}
           </p>
         </Reveal>
         <Reveal delay={300}>

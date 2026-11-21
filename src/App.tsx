@@ -14,7 +14,7 @@ import Footer from './components/Footer';
 import FloatingContactLinks from './components/FloatingContactLinks';
 import type { Tour, Hotel } from './lib/types';
 import { API_URL } from './lib/api';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, X } from 'lucide-react';
 
 
 export default function App() {
@@ -28,6 +28,7 @@ export default function App() {
   const [selectedTukTuk, setSelectedTukTuk] = useState<TukTukService | null>(null);
   const [selectedPrivateCar, setSelectedPrivateCar] = useState<PrivateCarService | null>(null);
   const [bookingCategory, setBookingCategory] = useState<BookingCategory>('tours');
+  const [bookingOpen, setBookingOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const activityTours = tours.filter((tour) => tour.category !== 'transfer');
@@ -69,23 +70,33 @@ export default function App() {
     load();
   }, []);
 
-  function scrollToBooking() {
-    document.getElementById('booking')?.scrollIntoView({
-      behavior: 'smooth',
-    });
-  }
+  useEffect(() => {
+    if (!bookingOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setBookingOpen(false);
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [bookingOpen]);
 
   function bookTour(tour: Tour) {
     setSelectedTour(tour);
     setBookingCategory('tours');
-    scrollToBooking();
+    setBookingOpen(true);
   }
 
   function bookStay(hotel: Hotel, roomType: string) {
     setStayHotel(hotel);
     setStayRoomType(roomType);
     setBookingCategory('accommodation');
-    scrollToBooking();
+    setBookingOpen(true);
   }
 
   function bookRental(rental: RentalBike) {
@@ -94,7 +105,7 @@ export default function App() {
     setSelectedTukTuk(null);
     setSelectedPrivateCar(null);
     setBookingCategory('transportation');
-    scrollToBooking();
+    setBookingOpen(true);
   }
 
   function bookBicycle(bicycle: BicycleRental) {
@@ -103,7 +114,7 @@ export default function App() {
     setSelectedTukTuk(null);
     setSelectedPrivateCar(null);
     setBookingCategory('transportation');
-    scrollToBooking();
+    setBookingOpen(true);
   }
 
   function bookTukTuk(service: TukTukService) {
@@ -112,7 +123,7 @@ export default function App() {
     setSelectedRental(null);
     setSelectedBicycle(null);
     setBookingCategory('transportation');
-    scrollToBooking();
+    setBookingOpen(true);
   }
 
   function requestPrivateCar(service: PrivateCarService) {
@@ -121,7 +132,7 @@ export default function App() {
     setSelectedTukTuk(null);
     setSelectedPrivateCar(service);
     setBookingCategory('transportation');
-    scrollToBooking();
+    setBookingOpen(true);
   }
 
   function changeTour(slug: string) {
@@ -138,16 +149,18 @@ export default function App() {
           <div className="flex items-center justify-center py-32 text-brand-700">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
-        ) : failed ? (
-          <div
-            className="mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-sm text-red-700"
-            style={{ marginTop: '6rem' }}
-          >
-            <AlertCircle className="h-5 w-5 shrink-0" />
-            Tours and hotels could not be loaded. Please refresh the page to try again.
-          </div>
         ) : (
           <>
+            {failed && (
+              <div
+                className="mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-sm text-red-700"
+                style={{ marginTop: '6rem' }}
+                role="status"
+              >
+                <AlertCircle className="h-5 w-5 shrink-0" />
+                Tours and hotels could not be loaded. Please refresh the page to try again.
+              </div>
+            )}
             <Stay hotels={hotels} onStay={bookStay} />
             <Tours tours={activityTours} onBook={bookTour} />
             <Transportation onBookRental={bookRental} onBookBicycle={bookBicycle} onBookTukTuk={bookTukTuk} onRequestPrivateCar={requestPrivateCar} />
@@ -157,6 +170,49 @@ export default function App() {
             <AboutUs />
             <WhyUs />
 
+            {!bookingOpen && (
+              <Booking
+                tours={activityTours}
+                hotels={hotels}
+                category={bookingCategory}
+                onCategoryChange={setBookingCategory}
+                selectedTour={selectedTour}
+                onChangeTour={changeTour}
+                selectedHotel={stayHotel}
+                selectedRoomType={stayRoomType}
+                onChangeHotel={setStayHotel}
+                selectedRental={selectedRental}
+                selectedBicycle={selectedBicycle}
+                selectedTukTuk={selectedTukTuk}
+                selectedPrivateCar={selectedPrivateCar}
+              />
+            )}
+
+          </>
+        )}
+      </main>
+
+      {bookingOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-brand-950/70 p-3 backdrop-blur-sm sm:p-6"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setBookingOpen(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Booking form"
+            className="relative my-auto max-h-[94vh] w-full max-w-5xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+          >
+            <button
+              type="button"
+              onClick={() => setBookingOpen(false)}
+              aria-label="Close booking form"
+              className="sticky right-4 top-4 z-10 float-right mr-4 mt-4 rounded-full bg-white p-2 text-brand-900 shadow-md transition hover:bg-clay-100"
+            >
+              <X className="h-5 w-5" />
+            </button>
             <Booking
               tours={activityTours}
               hotels={hotels}
@@ -172,10 +228,9 @@ export default function App() {
               selectedTukTuk={selectedTukTuk}
               selectedPrivateCar={selectedPrivateCar}
             />
-
-          </>
-        )}
-      </main>
+          </div>
+        </div>
+      )}
 
       <Footer />
       <FloatingContactLinks />
